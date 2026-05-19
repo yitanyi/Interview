@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Interview · 面试训练平台</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root{
+      --bg:#f5f7fb;
+      --panel:#ffffff;
+      --text:#0f172a;
+      --sub:#64748b;
+      --line:#e5eaf2;
+      --primary:#2563eb;
+      --primary-hover:#1d4ed8;
+      --success:#16a34a;
+      --danger:#ef4444;
+    }
+
+    :root[data-theme="dark"]{
+      --bg:#0b1220;
+      --panel:#0f172a;
+      --text:#e2e8f0;
+      --sub:#94a3b8;
+      --line:#1e293b;
+      --primary:#3b82f6;
+      --primary-hover:#2563eb;
+      --success:#22c55e;
+      --danger:#f87171;
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      background:var(--bg);
+      color:var(--text);
+      font-family:Inter, "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+      position: relative;
+    }
+
+    body::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      background: url('./assets/images/noise.svg') repeat;
+      opacity:.04;
+      pointer-events:none;
+      z-index:0;
+    }
+
+    .layout{
+      position: relative;
+      z-index:1;
+      display:grid;
+      grid-template-columns:240px 1fr;
+      min-height:100vh;
+    }
+
+    .sidebar{
+      background:var(--panel);
+      border-right:1px solid var(--line);
+      padding:22px 16px;
+      position:sticky;
+      top:0;
+      height:100vh;
+    }
+    .logo{
+      display:flex;align-items:center;gap:10px;
+      padding:8px 10px 18px;border-bottom:1px solid var(--line);margin-bottom:14px;
+    }
+    .logo-badge{
+      width:34px;height:34px;border-radius:10px;
+      background: linear-gradient(135deg,#1d4ed8,#0ea5e9);
+      position: relative; flex-shrink: 0;
+    }
+    .logo-badge::before{
+      content:"";position:absolute; inset:8px;
+      border:2px solid rgba(255,255,255,.92);border-radius:6px;
+    }
+    .logo-badge::after{
+      content:"";position:absolute; left:16px; top:9px; bottom:9px;
+      width:2px; background:rgba(255,255,255,.92);
+    }
+    .logo h2{margin:0;font-size:16px;line-height:1.2}
+    .logo p{margin:2px 0 0;color:var(--sub);font-size:12px}
+
+    .menu{display:flex;flex-direction:column;gap:6px;margin-top:8px;}
+    .menu a{
+      text-decoration:none;color:var(--text);
+      padding:10px 12px;border-radius:10px;font-size:14px;
+      display:flex;align-items:center;gap:8px;
+    }
+    .menu a:hover{background:#f1f5f9}
+    .menu a.active{background:#eaf1ff;color:#1d4ed8;font-weight:600;}
+
+    :root[data-theme="dark"] .menu a:hover{background:#111c31}
+    :root[data-theme="dark"] .menu a.active{background:#1b2b4a;color:#93c5fd}
+
+    .icon{width:16px;height:16px;display:inline-block;vertical-align:-2px;flex-shrink:0;}
+
+    .main{padding:20px 24px 28px;}
+    .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;}
+    .topbar h1{margin:0;font-size:22px;font-weight:700;}
+    .topbar .right{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+
+    .btn{
+      border:none;border-radius:10px;height:40px;padding:0 14px;
+      font-size:14px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;
+    }
+    .btn.primary{background:var(--primary);color:#fff;}
+    .btn.primary:hover{background:var(--primary-hover);}
+    .btn.ghost{background:var(--panel);border:1px solid var(--line);color:var(--text);}
+
+    .select{
+      height:40px;border:1px solid var(--line);background:var(--panel);
+      color:var(--text);border-radius:10px;padding:0 10px;font-size:14px;outline:none;
+    }
+
+    .hero{
+      background:linear-gradient(130deg,#0f1c2e,#1f3558);
+      color:#fff;border-radius:18px;padding:24px 22px;
+      box-shadow:0 10px 30px rgba(15,23,42,.06);
+      position: relative;overflow: hidden;
+      display:grid;grid-template-columns:1.2fr .8fr;gap:14px;align-items:center;
+    }
+    .hero::after{
+      content:"";position:absolute;width:360px;height:360px;right:-120px;top:-120px;
+      border-radius:50%;background: radial-gradient(circle, rgba(255,255,255,.16), transparent 65%);
+    }
+    .hero h2{margin:10px 0 10px;font-size:24px;font-weight:700;}
+    .hero p{margin:0;color:rgba(255,255,255,.85);line-height:1.65;font-size:14px;max-width:680px;}
+    .hero-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px;}
+    .hero .chip{
+      background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.18);
+      color:#fff;border-radius:999px;padding:6px 12px;font-size:12px;margin-right:8px;display:inline-block;
+    }
+    .hero-media{display:flex;justify-content:flex-end;align-items:center;min-height:220px;position:relative;z-index:2;}
+    .hero-media img{
+      width:100%;max-width:380px;object-fit:contain;border-radius:12px;
+      filter: drop-shadow(0 16px 30px rgba(0,0,0,.28));
+    }
+
+    .stats{margin-top:14px;display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+    .stat-card{
+      background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px;
+      box-shadow:0 4px 12px rgba(15,23,42,.03);
+    }
+    .stat-card .label{font-size:13px;color:var(--sub);margin-bottom:6px}
+    .stat-card .value{font-size:24px;font-weight:700}
+    .stat-card .up{color:var(--success);font-size:12px}
+    .stat-card .down{color:var(--danger);font-size:12px}
+
+    .modules{margin-top:14px;display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+    .module-card{
+      background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;
+      box-shadow:0 4px 12px rgba(15,23,42,.03);display:flex;flex-direction:column;justify-content:space-between;min-height:214px;overflow:hidden;
+    }
+.module-card img {
+  object-fit: contain;
+}
+    .module-cover{
+  width: 100%;
+  height: auto;          
+  max-height: 140px;       
+  object-fit: contain;    
+  border-radius: 10px;
+  margin-bottom: 12px;
+  border: none;
+  background: transparent; 
+    }
+    :root[data-theme="dark"] .module-cover{border-color:#334155;background:#0b1220;}
+    .module-card h3{margin:0 0 8px;font-size:16px;display:flex;align-items:center;gap:8px;}
+    .module-card p{margin:0;color:var(--sub);line-height:1.6;font-size:13px;}
+    .module-card .go{margin-top:16px;text-decoration:none;color:#60a5fa;font-size:13px;font-weight:600;}
+
+    .content{margin-top:14px;display:grid;grid-template-columns:1.5fr 1fr;gap:12px;}
+    .panel{
+      background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px;
+      box-shadow:0 4px 12px rgba(15,23,42,.03);
+    }
+    .panel h3{margin:0 0 10px;font-size:15px;display:flex;align-items:center;gap:8px;}
+    .panel .sub{color:var(--sub);font-size:12px;margin-top:-4px;margin-bottom:8px;}
+    .list{margin:0;padding:0;list-style:none;}
+    .list li{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px dashed #e8edf5;font-size:13px;}
+    :root[data-theme="dark"] .list li{border-bottom-color:#22314a}
+    .tag{font-size:12px;padding:3px 8px;border-radius:999px;background:#eef2ff;color:#3730a3;}
+    .score{font-weight:700}
+    .footer-note{margin-top:10px;color:var(--sub);font-size:12px}
+
+    @media (max-width:1100px){
+      .layout{grid-template-columns:1fr}
+      .sidebar{display:none}
+      .stats{grid-template-columns:repeat(2,1fr)}
+      .modules{grid-template-columns:1fr}
+      .content{grid-template-columns:1fr}
+      .hero{grid-template-columns:1fr}
+      .hero-media{justify-content:center;min-height:160px}
+      .hero-media img{max-width:300px}
+    }
+    .panel .chart-wrap {
+      height: 140px;
+      width: 100%;
+      position: relative;
+    }
+  </style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute;left:-9999px;top:-9999px;">
+  <symbol id="i-dashboard" viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="8" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="13" y="3" width="8" height="5" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="13" y="10" width="8" height="11" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="3" y="13" width="8" height="8" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+  <symbol id="i-bank" viewBox="0 0 24 24"><path d="M4 6.5A2.5 2.5 0 0 1 6.5 4H20v14H6.5A2.5 2.5 0 1 0 6.5 23H20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M6.5 4A2.5 2.5 0 0 0 4 6.5v14A2.5 2.5 0 0 1 6.5 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="9" y1="8" x2="16" y2="8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="9" y1="11.5" x2="16" y2="11.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+  <symbol id="i-interview" viewBox="0 0 24 24"><path d="M4 5.5h10a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H9l-4 3v-3H4a2 2 0 0 1-2-2v-6a2 2 0 0 1 2-2z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M14 8.5h6a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-1v2.5l-3-2.5h-2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+  <symbol id="i-report" viewBox="0 0 24 24"><path d="M4 20V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v14" fill="none" stroke="currentColor" stroke-width="1.8"/><polyline points="7,15 11,11 14,13 18,9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><line x1="7" y1="20" x2="20" y2="20" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+  <symbol id="i-export" viewBox="0 0 24 24"><path d="M12 3v12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M8 7l4-4 4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><rect x="4" y="13" width="16" height="8" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+</svg>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div class="logo">
+      <div class="logo-badge"></div>
+      <div>
+        <h2>Interview</h2>
+        <p data-i18n="brand.sub">面试训练平台</p>
+      </div>
+    </div>
+    <nav class="menu">
+      <a class="active" href="./index.html"><svg class="icon"><use href="#i-dashboard"></use></svg><span data-i18n="menu.overview">总览</span></a>
+      <a href="./pages/question-bank.html"><svg class="icon"><use href="#i-bank"></use></svg><span data-i18n="menu.bank">面试题库</span></a>
+      <a href="./pages/ai-interview.html"><svg class="icon"><use href="#i-interview"></use></svg><span data-i18n="menu.ai">AI面试模拟</span></a>
+      <a href="./pages/recent-report.html"><svg class="icon"><use href="#i-report"></use></svg><span data-i18n="menu.report">成绩与评价</span></a>
+    </nav>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <h1 data-i18n="top.title">面试训练总览</h1>
+      <div class="right">
+        <select id="langSelect" class="select">
+          <option value="zh">中文</option>
+          <option value="en">English</option>
+        </select>
+
+        <button id="themeToggle" class="btn ghost">
+          <span id="themeToggleText">深色模式</span>
+        </button>
+
+        <button id="logoutBtn" class="btn ghost">
+          <span data-i18n="top.logout">退出登录</span>
+        </button>
+
+        <button class="btn ghost">
+          <svg class="icon"><use href="#i-export"></use></svg>
+          <span data-i18n="top.export">导出报告</span>
+        </button>
+        <button class="btn primary" onclick="location.href='./pages/ai-interview.html'">
+          <span data-i18n="top.newInterview">开始新面试</span>
+        </button>
+      </div>
+    </div>
+
+    <section class="hero">
+      <div class="hero-left">
+        <span class="chip" data-i18n="hero.chip1">智能追问</span>
+        <span class="chip" data-i18n="hero.chip2">语音分析</span>
+        <span class="chip" data-i18n="hero.chip3">岗位化评估</span>
+        <h2 data-i18n="hero.title">把每一次练习，变成可量化的进步</h2>
+        <p data-i18n="hero.desc">通过题库训练 + AI实战模拟 + 面试复盘评分，持续提升技术表达、逻辑结构与岗位匹配度。</p>
+        <div class="hero-actions">
+          <button class="btn primary" onclick="location.href='./pages/ai-interview.html'"><span data-i18n="hero.enterAI">进入 AI 面试</span></button>
+          <button class="btn ghost" onclick="location.href='./pages/question-bank.html'"><span data-i18n="hero.goBank">去题库刷题</span></button>
+        </div>
+      </div>
+      <div class="hero-media">
+        <img src="./assets/images/hero-illustration.png" alt="hero" loading="eager" />
+      </div>
+    </section>
+
+    <section class="stats">
+      <div class="stat-card">
+        <div class="label" data-i18n="stats.weekly">本周面试次数</div>
+        <div class="value">0</div>
+        <div class="up" data-i18n="stats.weeklyDelta">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="label" data-i18n="stats.recent">最近综合评分</div>
+        <div class="value">-</div>
+        <div class="up" data-i18n="stats.recentDelta">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="label" data-i18n="stats.best">最高维度</div>
+        <div class="value" data-i18n="stats.bestValue">-</div>
+        <div class="up">- / 5.0</div>
+      </div>
+      <div class="stat-card">
+        <div class="label" data-i18n="stats.weak">待强化维度</div>
+        <div class="value" data-i18n="stats.weakValue">-</div>
+        <div class="down">- / 5.0</div>
+      </div>
+    </section>
+
+    <section class="modules">
+      <article class="module-card">
+        <img class="module-cover" src="./assets/images/card-bank.png" alt="题库封面" loading="lazy">
+        <div>
+          <h3><svg class="icon"><use href="#i-bank"></use></svg> <span data-i18n="module.bankTitle">相关面试题库</span></h3>
+          <p data-i18n="module.bankDesc">按岗位 / 技术栈 / 难度筛选，支持随机抽题与错题复习。</p>
+        </div>
+        <a class="go" href="./pages/question-bank.html" data-i18n="module.bankGo">进入题库 →</a>
+      </article>
+
+      <article class="module-card">
+        <img class="module-cover" src="./assets/images/card-interview.png" alt="AI模拟封面" loading="lazy">
+        <div>
+          <h3><svg class="icon"><use href="#i-interview"></use></svg> <span data-i18n="module.aiTitle">AI面试模拟</span></h3>
+          <p data-i18n="module.aiDesc">真实问答节奏，支持追问与表达分析，结束后自动生成报告。</p>
+        </div>
+        <a class="go" href="./pages/ai-interview.html" data-i18n="module.aiGo">开始模拟 →</a>
+      </article>
+
+      <article class="module-card">
+        <img class="module-cover" src="./assets/images/card-report.png" alt="报告封面" loading="lazy">
+        <div>
+          <h3><svg class="icon"><use href="#i-report"></use></svg> <span data-i18n="module.reportTitle">最近成绩和评价</span></h3>
+          <p data-i18n="module.reportDesc">查看趋势图、维度雷达图和历次反馈，定位薄弱点。</p>
+        </div>
+        <a class="go" href="./pages/recent-report.html" data-i18n="module.reportGo">查看报告 →</a>
+      </article>
+    </section>
+
+    <section class="content">
+      <div class="panel">
+        <h3><svg class="icon"><use href="#i-report"></use></svg> <span data-i18n="panel.trendTitle">最近 7 次模拟成绩趋势</span></h3>
+        <div class="sub" data-i18n="panel.unit">单位：5分制</div>
+        <div class="chart-wrap">
+          <canvas id="trendChart"></canvas>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3><svg class="icon"><use href="#i-interview"></use></svg> <span data-i18n="panel.recentTitle">最近面试记录</span></h3>
+        <ul class="list" id="recent-list">
+          <li style="justify-content:center; color:var(--sub);">加载中...</li>
+        </ul>
+        <div class="footer-note" data-i18n="panel.note">建议：下一次优先练"项目深挖 + 结构化表达"。</div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script>
+  const messages = {
+    zh: {
+      brand:{ sub:"面试训练平台" },
+      menu:{ overview:"总览", bank:"面试题库", ai:"AI面试模拟", report:"成绩与评价" },
+      top:{ title:"面试训练总览", logout:"退出登录", export:"导出报告", newInterview:"开始新面试" },
+      hero:{
+        chip1:"智能追问", chip2:"语音分析", chip3:"岗位化评估",
+        title:"把每一次练习，变成可量化的进步",
+        desc:"通过题库训练 + AI实战模拟 + 面试复盘评分，持续提升技术表达、逻辑结构与岗位匹配度。建议每周完成 3 次模拟，关注'深度'和'沟通表达'两个维度。",
+        enterAI:"进入 AI 面试", goBank:"去题库刷题"
+      },
+      stats:{
+        weekly:"本周面试次数", weeklyDelta:"—",
+        recent:"最近综合评分", recentDelta:"—",
+        best:"最高维度", bestValue:"技术深度",
+        weak:"待强化维度", weakValue:"沟通表达"
+      },
+      module:{
+        bankTitle:"相关面试题库", bankDesc:"按岗位 / 技术栈 / 难度筛选，支持随机抽题与错题复习。", bankGo:"进入题库 →",
+        aiTitle:"AI面试模拟", aiDesc:"真实问答节奏，支持追问与表达分析，结束后自动生成报告。", aiGo:"开始模拟 →",
+        reportTitle:"最近成绩和评价", reportDesc:"查看趋势图、维度雷达图和历次反馈，定位薄弱点。", reportGo:"查看报告 →"
+      },
+      panel:{
+        trendTitle:"最近 7 次模拟成绩趋势", unit:"单位：5分制",
+        recentTitle:"最近面试记录", note:"建议：下一次优先练'项目深挖 + 结构化表达'。"
+      },
+      list:{
+        i1:"Java后端 · judge", i2:"Java后端 · guide", i3:"前端开发 · random", i4:"算法岗 · professional", i5:"产品经理 · guide",
+        done:"已完成"
+      },
+      chart:{ score:"综合分" },
+      theme:{ toDark:"深色模式", toLight:"浅色模式" }
+    },
+    en: {
+      brand:{ sub:"Interview Training Platform" },
+      menu:{ overview:"Overview", bank:"Question Bank", ai:"AI Mock Interview", report:"Scores & Feedback" },
+      top:{ title:"Interview Training Overview", logout:"Log out", export:"Export Report", newInterview:"Start New Interview" },
+      hero:{
+        chip1:"Smart Follow-up", chip2:"Voice Analysis", chip3:"Role-based Evaluation",
+        title:"Turn every practice into measurable progress",
+        desc:"Improve technical expression, logical structure, and role fit through question-bank practice, AI mock interviews, and report-based review.",
+        enterAI:"Enter AI Interview", goBank:"Practice in Question Bank"
+      },
+      stats:{
+        weekly:"Interviews This Week", weeklyDelta:"—",
+        recent:"Latest Overall Score", recentDelta:"—",
+        best:"Best Dimension", bestValue:"Technical Depth",
+        weak:"Needs Improvement", weakValue:"Communication"
+      },
+      module:{
+        bankTitle:"Interview Question Bank", bankDesc:"Filter by role/stack/difficulty. Support random picks and mistake review.", bankGo:"Go to Bank →",
+        aiTitle:"AI Mock Interview", aiDesc:"Real interview rhythm with follow-up and expression analysis.", aiGo:"Start Mock →",
+        reportTitle:"Recent Scores & Feedback", reportDesc:"View trend charts and feedback to locate weak points.", reportGo:"View Report →"
+      },
+      panel:{
+        trendTitle:"Trend of Last 7 Mock Interviews", unit:"Unit: 5-point scale",
+        recentTitle:"Recent Interview Records", note:"Suggestion: focus on project deep-dive + structured communication next."
+      },
+      list:{
+        i1:"Java Backend · judge", i2:"Java Backend · guide", i3:"Frontend · random", i4:"Algorithm · professional", i5:"Product Manager · guide",
+        done:"Done"
+      },
+      chart:{ score:"Overall Score" },
+      theme:{ toDark:"Dark Mode", toLight:"Light Mode" }
+    }
+  };
+
+  const dimMap = {
+    zh: {
+      technical_accuracy: '技术正确性',
+      depth: '知识深度',
+      logic: '逻辑严谨性',
+      fit: '岗位匹配度',
+      communication: '沟通表达'
+    },
+    en: {
+      technical_accuracy: 'Technical Accuracy',
+      depth: 'Depth',
+      logic: 'Logic',
+      fit: 'Fit',
+      communication: 'Communication'
+    }
+  };
+
+  function getByPath(obj, path){
+    return path.split('.').reduce((o, k) => o && o[k], obj);
+  }
+
+  let currentLang = localStorage.getItem('lang') || 'zh';
+
+  function updateThemeBtnText(){
+    const theme = document.documentElement.getAttribute('data-theme') || 'light';
+    const key = theme === 'light' ? 'theme.toDark' : 'theme.toLight';
+    document.getElementById('themeToggleText').textContent = getByPath(messages[currentLang], key);
+  }
+
+  function applyTheme(theme){
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('theme', theme);
+    updateThemeBtnText();
+  }
+
+  function applyLanguage(lang){
+    currentLang = lang;
+    localStorage.setItem('lang', lang);
+    document.documentElement.lang = lang === 'zh' ? 'zh-CN' : 'en';
+
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const txt = getByPath(messages[lang], el.dataset.i18n);
+      if (txt) el.textContent = txt;
+    });
+
+    updateThemeBtnText();
+    loadDashboardData();
+  }
+
+
+document.querySelector('button.btn.ghost svg use[href="#i-export"]')?.closest('button').addEventListener('click', exportReport);
+
+async function exportReport() {
+  try {
+    const userId = 'anonymous';
+    const response = await fetch(`http://localhost:5000/api/export/pdf?user_id=${userId}`);
+    if (!response.ok) throw new Error('生成 PDF 失败');
+    
+    // 将返回的二进制数据转为 Blob 并下载
+    const blob = await response.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `interview_history_${new Date().toISOString().slice(0,10)}.pdf`;
+    a.click();
+    URL.revokeObjectURL(url);
+  } catch (err) {
+    alert('导出失败：' + err.message);
+  }
+}
+
+
+
+
+
+
+
+
+
+  async function loadDashboardData() {
+    const userId = 'anonymous';
+    const listEl = document.getElementById('recent-list');
+    const weeklyValueEl = document.querySelector('.stats .stat-card:nth-child(1) .value');
+    const weeklyDeltaEl = document.querySelector('.stats .stat-card:nth-child(1) [data-i18n="stats.weeklyDelta"]');
+    const recentScoreValueEl = document.querySelector('.stats .stat-card:nth-child(2) .value');
+    const recentScoreDeltaEl = document.querySelector('.stats .stat-card:nth-child(2) [data-i18n="stats.recentDelta"]');
+    const bestDimValueEl = document.querySelector('.stats .stat-card:nth-child(3) .value');
+    const bestDimScoreEl = document.querySelector('.stats .stat-card:nth-child(3) .up');
+    const weakDimValueEl = document.querySelector('.stats .stat-card:nth-child(4) .value');
+    const weakDimScoreEl = document.querySelector('.stats .stat-card:nth-child(4) .down');
+
+    try {
+      const res = await fetch(`http://localhost:5000/api/user/history?user_id=${userId}`);
+      if (!res.ok) throw new Error(`HTTP ${res.status} - ${res.statusText}`);
+      
+      const history = await res.json();
+
+      if (!Array.isArray(history)) {
+        throw new Error('返回的数据格式异常：不是数组');
+      }
+
+      if (history.length === 0) {
+        if (weeklyValueEl) weeklyValueEl.textContent = '0';
+        if (weeklyDeltaEl) { weeklyDeltaEl.textContent = '—'; weeklyDeltaEl.classList.remove('down'); weeklyDeltaEl.classList.add('up'); }
+        if (recentScoreValueEl) recentScoreValueEl.textContent = '-';
+        if (recentScoreDeltaEl) { recentScoreDeltaEl.textContent = '—'; recentScoreDeltaEl.classList.remove('down'); recentScoreDeltaEl.classList.add('up'); }
+        if (bestDimValueEl) bestDimValueEl.textContent = '-';
+        if (bestDimScoreEl) bestDimScoreEl.textContent = '- / 5.0';
+        if (weakDimValueEl) weakDimValueEl.textContent = '-';
+        if (weakDimScoreEl) weakDimScoreEl.textContent = '- / 5.0';
+        
+        if (listEl) {
+          listEl.innerHTML = '<li style="justify-content:center; color:var(--sub);">暂无面试记录，快去AI面试模拟吧！</li>';
+        }
+        updateTrendChart([], []);
+        return;
+      }
+
+
+
+
+
+
+
+
+      const safeHistory = [...history].sort((a, b) => new Date(a.date) - new Date(b.date));
+
+      const formatCountDelta = (diff) => {
+        if (diff === 0) return currentLang === 'zh' ? '— 与上周持平' : '— Same as last week';
+        const arrow = diff > 0 ? '↑' : '↓';
+        const sign = diff > 0 ? '+' : '-';
+        const abs = Math.abs(diff);
+        return currentLang === 'zh'
+          ? `${arrow} 较上周 ${sign}${abs}`
+          : `${arrow} ${sign}${abs} vs last week`;
+      };
+
+      const formatScoreDelta = (diff) => {
+        if (diff === 0) return currentLang === 'zh' ? '— 与上次持平' : '— Same as last time';
+        const arrow = diff > 0 ? '↑' : '↓';
+        const sign = diff > 0 ? '+' : '-';
+        const abs = Math.abs(diff).toFixed(1);
+        return currentLang === 'zh'
+          ? `${arrow} 较上次 ${sign}${abs}`
+          : `${arrow} ${sign}${abs} vs last time`;
+      };
+
+      const setDeltaStyle = (el, diff) => {
+        if (!el) return;
+        el.classList.remove('up', 'down');
+        el.classList.add(diff >= 0 ? 'up' : 'down');
+      };
+
+      // 本周 vs 上周（按周一为一周开始）
+      const now = new Date();
+      const startOfThisWeek = new Date(now);
+      const dayIndex = (startOfThisWeek.getDay() + 6) % 7; // Monday=0 ... Sunday=6
+      startOfThisWeek.setDate(startOfThisWeek.getDate() - dayIndex);
+      startOfThisWeek.setHours(0, 0, 0, 0);
+      const startOfNextWeek = new Date(startOfThisWeek);
+      startOfNextWeek.setDate(startOfThisWeek.getDate() + 7);
+      const startOfLastWeek = new Date(startOfThisWeek);
+      startOfLastWeek.setDate(startOfThisWeek.getDate() - 7);
+
+      const thisWeekCount = safeHistory.filter(item => {
+        const d = new Date(item.date);
+        return d >= startOfThisWeek && d < startOfNextWeek;
+      }).length;
+      const lastWeekCount = safeHistory.filter(item => {
+        const d = new Date(item.date);
+        return d >= startOfLastWeek && d < startOfThisWeek;
+      }).length;
+      const weeklyDiff = thisWeekCount - lastWeekCount;
+
+      if (weeklyValueEl) weeklyValueEl.textContent = thisWeekCount;
+      if (weeklyDeltaEl) {
+        weeklyDeltaEl.textContent = formatCountDelta(weeklyDiff);
+        setDeltaStyle(weeklyDeltaEl, weeklyDiff);
+      }
+
+      // 最近综合评分（取最近一次），并显示较上次变化
+      const latest = safeHistory[safeHistory.length - 1] || {};
+      const latestScore = Number(latest.overall_score ?? 0) || 0;
+      const prev = safeHistory[safeHistory.length - 2] || null;
+      const prevScore = prev ? (Number(prev.overall_score ?? 0) || 0) : null;
+      const scoreDiff = prevScore === null ? null : (latestScore - prevScore);
+
+      if (recentScoreValueEl) recentScoreValueEl.textContent = latestScore ? latestScore.toFixed(1) : '-';
+      if (recentScoreDeltaEl) {
+        if (scoreDiff === null) {
+          recentScoreDeltaEl.textContent = currentLang === 'zh' ? '— 暂无对比' : '— No comparison yet';
+          setDeltaStyle(recentScoreDeltaEl, 0);
+        } else {
+          recentScoreDeltaEl.textContent = formatScoreDelta(scoreDiff);
+          setDeltaStyle(recentScoreDeltaEl, scoreDiff);
+        }
+      }
+
+      // 最高/待强化维度（取最近一次的维度分）
+      const dims = ['technical_accuracy', 'depth', 'logic', 'fit', 'communication'];
+      const latestDimScores = latest.scores || {};
+      const scoredDims = dims
+        .map(k => [k, latestDimScores[k]])
+        .filter(([, v]) => typeof v === 'number' && !Number.isNaN(v));
+
+      if (scoredDims.length === 0) {
+        if (bestDimValueEl) bestDimValueEl.textContent = '-';
+        if (bestDimScoreEl) bestDimScoreEl.textContent = '- / 5.0';
+        if (weakDimValueEl) weakDimValueEl.textContent = '-';
+        if (weakDimScoreEl) weakDimScoreEl.textContent = '- / 5.0';
+      } else {
+        const best = scoredDims.reduce((a, b) => (b[1] > a[1] ? b : a), scoredDims[0]);
+        const worst = scoredDims.reduce((a, b) => (b[1] < a[1] ? b : a), scoredDims[0]);
+        const bestDimName = dimMap[currentLang]?.[best[0]] || best[0];
+        const worstDimName = dimMap[currentLang]?.[worst[0]] || worst[0];
+        if (bestDimValueEl) bestDimValueEl.textContent = bestDimName;
+        if (bestDimScoreEl) bestDimScoreEl.textContent = `${Number(best[1]).toFixed(1)} / 5.0`;
+        if (weakDimValueEl) weakDimValueEl.textContent = worstDimName;
+        if (weakDimScoreEl) weakDimScoreEl.textContent = `${Number(worst[1]).toFixed(1)} / 5.0`;
+      }
+
+      if (listEl) {
+        const recentItems = safeHistory.slice(-5).reverse();
+        listEl.innerHTML = recentItems.map(item =>
+          `<li><span>${item.position || '未知岗位'}</span><span><span class="tag">已完成</span> <span class="score">${(item.overall_score || 0).toFixed(1)}</span></span></li>`
+        ).join('');
+      }
+
+      const chartData = safeHistory.slice(-7);
+      const labels = chartData.map(item => item.date.slice(5, 10));
+      const scores = chartData.map(item => item.overall_score || 0);
+      try {
+        updateTrendChart(labels, scores);
+      } catch (e) {
+        console.error('更新图表时出错（不影响数据展示）', e);
+      }
+
+    } catch (err) {
+      console.error('加载总览数据失败', err);
+      alert('无法获取历史数据，请检查后端服务是否运行。');
+      if (listEl) {
+        listEl.innerHTML = `<li style="color:var(--danger);">❌ 加载失败：${err.message}。请确保后端服务已启动（端口5000）并刷新页面。</li>`;
+      }
+    }
+  }
+
+ function updateTrendChart(labels, scores) {
+  const ctx = document.getElementById('trendChart');
+  if (!ctx) return;
+
+  // 安全销毁：检查是否存在且为 Chart 实例（通过是否有 destroy 方法判断）
+  if (window.trendChart && typeof window.trendChart.destroy === 'function') {
+    try {
+      window.trendChart.destroy();
+    } catch (e) {
+      console.warn('销毁旧图表失败', e);
+    }
+  }
+  // 即使销毁失败，也重置变量，准备创建新图表
+  window.trendChart = null;
+
+  try {
+    window.trendChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: messages[currentLang].chart.score,
+          data: scores,
+          borderColor: '#2563eb',
+          backgroundColor: 'rgba(37,99,235,.12)',
+          fill: true,
+          tension: 0.35,
+          pointRadius: 3,
+          pointHoverRadius: 5
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          y: { min: 0, max: 5, ticks: { stepSize: 1 } },
+          x: { grid: { display: false } }
+        }
+      }
+    });
+  } catch (e) {
+    console.error('创建图表失败', e);
+  }
+}
+
+  const savedTheme = localStorage.getItem('theme');
+  const preferredDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  applyTheme(savedTheme || (preferredDark ? 'dark' : 'light'));
+
+  const langSelect = document.getElementById('langSelect');
+  langSelect.value = currentLang;
+  langSelect.addEventListener('change', e => applyLanguage(e.target.value));
+
+  document.getElementById('themeToggle').addEventListener('click', () => {
+    const cur = document.documentElement.getAttribute('data-theme') || 'light';
+    applyTheme(cur === 'light' ? 'dark' : 'light');
+  });
+
+  // logout (demo): remove auth-ish keys but keep preferences like theme/lang.
+  document.getElementById('logoutBtn')?.addEventListener('click', () => {
+    [
+      'rr_auth','rr_user','rr_user_id','rr_token',
+      'token','access_token','refresh_token'
+    ].forEach(k => localStorage.removeItem(k));
+    window.location.href = './login.html';
+  });
+
+  applyLanguage(currentLang);
+  
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', loadDashboardData);
+  } else {
+    loadDashboardData();
+  }
+</script>
+</body>
+</html>

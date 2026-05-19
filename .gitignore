@@ -1,0 +1,33 @@
+# Python / Cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual env
+venv/
+env/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Secrets / local config
+config.ini
+baidu_ocr_token.json
+
+# Local runtime data
+chroma_db/
+*.db
+interview_history.json
+temp/
+temp_audio.mp3
+
+# Logs / temp
+*.log
+*.tmp
+*.temp

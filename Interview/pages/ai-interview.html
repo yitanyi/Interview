@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Interview · AI面试模拟</title>
+  <style>
+    :root{
+      --bg:#f5f7fb;
+      --panel:#ffffff;
+      --text:#0f172a;
+      --sub:#64748b;
+      --line:#e5eaf2;
+      --primary:#2563eb;
+      --primary-hover:#1d4ed8;
+      --success:#16a34a;
+      --danger:#ef4444;
+      --soft:#f8fafc;
+      --chip:#eef2ff;
+    }
+
+    :root[data-theme="dark"]{
+      --bg:#0b1220;
+      --panel:#0f172a;
+      --text:#e2e8f0;
+      --sub:#94a3b8;
+      --line:#1e293b;
+      --primary:#3b82f6;
+      --primary-hover:#2563eb;
+      --success:#22c55e;
+      --danger:#f87171;
+      --soft:#0b1220;
+      --chip:#1b2b4a;
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      background:var(--bg);
+      color:var(--text);
+      font-family:Inter, "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+      position: relative;
+    }
+    body::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      background:url('../assets/images/noise.svg') repeat;
+      opacity:.04;
+      pointer-events:none;
+      z-index:0;
+    }
+
+    .layout{
+      position:relative;z-index:1;
+      display:grid;
+      grid-template-columns:240px 1fr;
+      min-height:100vh;
+    }
+
+    /* Sidebar - 与主页面一致 */
+    .sidebar{
+      background:var(--panel);
+      border-right:1px solid var(--line);
+      padding:22px 16px;
+      position:sticky;top:0;height:100vh;
+    }
+    .logo{
+      display:flex;align-items:center;gap:10px;
+      padding:8px 10px 18px;border-bottom:1px solid var(--line);margin-bottom:14px;
+    }
+    .logo-badge{
+      width:34px;height:34px;border-radius:10px;
+      background: linear-gradient(135deg,#1d4ed8,#0ea5e9);
+      position:relative;flex-shrink:0;
+    }
+    .logo-badge::before{
+      content:"";position:absolute;inset:8px;border:2px solid rgba(255,255,255,.92);border-radius:6px;
+    }
+    .logo-badge::after{
+      content:"";position:absolute;left:16px;top:9px;bottom:9px;width:2px;background:rgba(255,255,255,.92);
+    }
+    .logo h2{margin:0;font-size:16px;line-height:1.2}
+    .logo p{margin:2px 0 0;color:var(--sub);font-size:12px}
+
+    .menu{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+    .menu a{
+      text-decoration:none;color:var(--text);
+      padding:10px 12px;border-radius:10px;font-size:14px;
+      display:flex;align-items:center;gap:8px;
+    }
+    .menu a:hover{background:#f1f5f9}
+    .menu a.active{background:#eaf1ff;color:#1d4ed8;font-weight:600}
+    :root[data-theme="dark"] .menu a:hover{background:#111c31}
+    :root[data-theme="dark"] .menu a.active{background:#1b2b4a;color:#93c5fd}
+
+    .icon{width:16px;height:16px;display:inline-block;vertical-align:-2px;flex-shrink:0}
+
+    .main{padding:20px 24px 28px;min-width:0}
+    .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;gap:10px;flex-wrap:wrap}
+    .topbar h1{margin:0;font-size:22px;font-weight:700}
+    .topbar .right{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+
+    .btn{
+      border:none;border-radius:10px;height:40px;padding:0 14px;
+      font-size:14px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;
+    }
+    .btn.primary{background:var(--primary);color:#fff}
+    .btn.primary:hover{background:var(--primary-hover)}
+    .btn.ghost{background:var(--panel);border:1px solid var(--line);color:var(--text)}
+    .btn.danger{background:var(--danger);color:#fff}
+    .btn:disabled{opacity:.55;cursor:not-allowed}
+
+    .panel{
+      background:var(--panel);
+      border:1px solid var(--line);
+      border-radius:14px;
+      box-shadow:0 4px 12px rgba(15,23,42,.03);
+    }
+
+    .page{
+      display:grid;
+      grid-template-columns:1.5fr 1fr;
+      gap:12px;
+    }
+
+    .left{display:flex;flex-direction:column;min-height:720px;overflow:hidden}
+    .head{
+      padding:14px;
+      border-bottom:1px solid var(--line);
+      display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;
+      background:linear-gradient(180deg, rgba(37,99,235,.08), transparent 70%);
+    }
+    .status{
+      font-size:12px;padding:4px 10px;border-radius:999px;background:var(--chip);color:var(--sub)
+    }
+    .status.running{background:rgba(34,197,94,.15);color:var(--success)}
+    .status.ended{background:rgba(239,68,68,.15);color:var(--danger)}
+
+    .config{
+      padding:14px;
+      border-bottom:1px solid var(--line);
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:10px;
+    }
+    .field label{display:block;font-size:12px;color:var(--sub);margin-bottom:6px}
+    .input,.select{
+      width:100%;height:38px;
+      border:1px solid var(--line);
+      border-radius:10px;
+      background:var(--panel);
+      color:var(--text);
+      padding:0 10px;
+      outline:none;
+    }
+    .file-row{display:flex;gap:8px}
+    #resumeFile{padding:6px 8px}
+    #uploadStatus{font-size:12px;color:var(--sub);margin-top:6px;display:block}
+
+    .chat{
+      flex:1;overflow:auto;padding:14px;background:var(--soft);
+      display:flex;flex-direction:column;gap:10px;
+    }
+    .msg{max-width:84%}
+    .msg.bot{align-self:flex-start}
+    .msg.me{align-self:flex-end}
+    .bubble{
+      padding:10px 12px;border-radius:12px;line-height:1.6;
+      white-space:pre-wrap;word-break:break-word;font-size:14px;
+    }
+    .bot .bubble{
+      background:var(--panel);border:1px solid var(--line);border-bottom-left-radius:6px;
+    }
+    .me .bubble{
+      background:var(--primary);color:#fff;border-bottom-right-radius:6px;
+    }
+    .meta{font-size:11px;color:var(--sub);margin-top:4px;padding:0 4px}
+
+    .input-area{
+      border-top:1px solid var(--line);
+      padding:12px;
+      display:flex;gap:10px;align-items:center;flex-wrap:wrap;
+    }
+    .input-wrap{
+      flex:1;min-width:260px;
+      border:1px solid var(--line);border-radius:999px;background:var(--soft);
+      display:flex;align-items:center;gap:8px;padding:0 8px 0 14px;
+    }
+    #messageInput{
+      flex:1;height:42px;border:none;outline:none;background:transparent;color:var(--text);font-size:14px;
+    }
+    #analysisIndicator{
+      font-size:12px;color:var(--sub);
+      border:1px solid var(--line);border-radius:999px;padding:4px 8px;background:var(--panel);
+      white-space:nowrap;
+    }
+    .mic{
+      width:40px;height:40px;border:none;border-radius:999px;cursor:pointer;font-size:18px;
+      display:flex;align-items:center;justify-content:center;background:#e2e8f0;
+    }
+    .mic.recording{
+      background:#ef4444;color:#fff;animation:pulse 1s infinite;
+    }
+    @keyframes pulse{
+      0%{box-shadow:0 0 0 0 rgba(239,68,68,.4)}
+      70%{box-shadow:0 0 0 10px rgba(239,68,68,0)}
+      100%{box-shadow:0 0 0 0 rgba(239,68,68,0)}
+    }
+
+    .right{display:flex;flex-direction:column;gap:12px}
+    .side-panel{padding:14px}
+    .side-panel h3{margin:0 0 10px;font-size:15px}
+    .kv{
+      display:flex;justify-content:space-between;gap:10px;
+      padding:8px 0;border-bottom:1px dashed var(--line);font-size:13px;
+    }
+    .kv:last-child{border-bottom:none}
+    .chip{font-size:12px;padding:3px 8px;border-radius:999px;background:var(--chip);color:var(--sub)}
+
+    #reportPanel{display:none}
+    .score-box{
+      border:1px solid var(--line);border-radius:10px;background:var(--soft);padding:10px;margin-bottom:10px;
+    }
+    .score-item{display:flex;justify-content:space-between;font-size:13px;margin:4px 0}
+    .tag{
+      display:inline-block;font-size:12px;padding:3px 8px;border-radius:999px;border:1px solid var(--line);margin:3px 4px 0 0;
+      background:var(--panel);
+    }
+
+    .hidden{display:none !important}
+
+    @media (max-width:1100px){
+      .layout{grid-template-columns:1fr}
+      .sidebar{display:none}
+      .page{grid-template-columns:1fr}
+      .left{min-height:auto}
+    }
+    @media (max-width:760px){
+      .config{grid-template-columns:1fr}
+      .msg{max-width:95%}
+      .input-area{flex-direction:column;align-items:stretch}
+    }
+  </style>
+</head>
+<body>
+<!-- 图标定义 -->
+<svg width="0" height="0" style="position:absolute;left:-9999px;top:-9999px;">
+  <symbol id="i-dashboard" viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="8" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="13" y="3" width="8" height="5" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="13" y="10" width="8" height="11" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="3" y="13" width="8" height="8" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+  <symbol id="i-bank" viewBox="0 0 24 24"><path d="M4 6.5A2.5 2.5 0 0 1 6.5 4H20v14H6.5A2.5 2.5 0 1 0 6.5 23H20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M6.5 4A2.5 2.5 0 0 0 4 6.5v14A2.5 2.5 0 0 1 6.5 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+  <symbol id="i-interview" viewBox="0 0 24 24"><path d="M4 5.5h10a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H9l-4 3v-3H4a2 2 0 0 1-2-2v-6a2 2 0 0 1 2-2z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+  <symbol id="i-report" viewBox="0 0 24 24"><path d="M4 20V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v14" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+</svg>
+
+<div class="layout">
+  <!-- 侧栏（不改主页面，仅在该子页保持同风格） -->
+  <aside class="sidebar">
+    <div class="logo">
+      <div class="logo-badge"></div>
+      <div>
+        <h2>Interview</h2>
+        <p>面试训练平台</p>
+      </div>
+    </div>
+    <nav class="menu">
+      <a href="../index.html"><svg class="icon"><use href="#i-dashboard"></use></svg>总览</a>
+      <a href="./question-bank.html"><svg class="icon"><use href="#i-bank"></use></svg>面试题库</a>
+      <a class="active" href="./ai-interview.html"><svg class="icon"><use href="#i-interview"></use></svg>AI面试模拟</a>
+      <a href="./recent-report.html"><svg class="icon"><use href="#i-report"></use></svg>成绩与评价</a>
+    </nav>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <h1>AI 面试模拟</h1>
+      <div class="right">
+        <button id="themeToggle" class="btn ghost"><span id="themeToggleText">深色模式</span></button>
+      </div>
+    </div>
+
+    <section class="page">
+      <!-- 左侧：对话区 -->
+      <div class="panel left">
+        <div class="head">
+          <strong>Interview Studio</strong>
+          <span class="status" id="sessionStatus">未开始</span>
+        </div>
+
+        <div class="config">
+          <div class="field">
+            <label>岗位</label>
+            <select id="positionSelect" class="select">
+              <option value="Java后端开发工程师">Java后端开发工程师</option>
+              <option value="Web前端开发工程师">Web前端开发工程师</option>
+              <option value="Python算法工程师">Python算法工程师</option>
+              <option value="产品经理">产品经理</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>面试风格</label>
+            <select id="styleSelect" class="select">
+              <option value="judge">审判型 (judge)</option>
+              <option value="professional">专业型 (professional)</option>
+              <option value="random">随缘型 (random)</option>
+              <option value="guide">引导宽和 (guide)</option>
+              <option value="student">校园友好 (student)</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>简历上传（可选）</label>
+            <div class="file-row">
+              <input class="input" id="resumeFile" type="file" accept=".pdf,.jpg,.jpeg,.png,.bmp,.gif,.tiff,.webp,image/*">
+              <button class="btn ghost" id="uploadBtn" type="button">上传</button>
+            </div>
+            <small id="uploadStatus">未上传简历也可以开始：面试官会先从岗位要求与您的回答出发提问。</small>
+          </div>
+          <div class="field">
+            <label>&nbsp;</label>
+            <button class="btn primary" id="startBtn" type="button" style="width:100%">开始面试</button>
+          </div>
+        </div>
+
+        <div class="chat" id="chatArea">
+          <div class="msg bot">
+            <div class="bubble">你好！点击“开始面试”，我将根据岗位与你进行模拟面试。</div>
+            <div class="meta">系统</div>
+          </div>
+        </div>
+
+        <div class="input-area hidden" id="inputArea">
+          <div class="input-wrap">
+            <input id="messageInput" type="text" placeholder="输入回答，或按住🎤说话..." disabled />
+            <span id="analysisIndicator"></span>
+            <button id="micBtn" class="mic" disabled>🎤</button>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn primary" id="sendBtn" disabled>发送</button>
+            <button class="btn danger" id="endBtn" disabled>结束并生成报告</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 右侧：状态 + 报告 -->
+      <div class="right">
+        <div class="panel side-panel">
+          <h3>会话状态</h3>
+          <div class="kv"><span>当前岗位</span><span id="sPosition">-</span></div>
+          <div class="kv"><span>面试风格</span><span id="sStyle">-</span></div>
+          <div class="kv"><span>简历状态</span><span id="sResume" class="chip">未上传</span></div>
+          <div class="kv"><span>Session ID</span><span id="sSession">-</span></div>
+        </div>
+
+        <div class="panel side-panel">
+          <h3>语音分析</h3>
+          <div id="audioSummary" style="color:var(--sub);font-size:13px;">暂无语音分析数据</div>
+        </div>
+
+        <div class="panel side-panel" id="reportPanel">
+          <h3>📊 面试报告</h3>
+          <div id="reportContent" style="font-size:13px;color:var(--sub)">加载中...</div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script>
+(function(){
+  const API_BASE = 'http://localhost:5000/api';
+
+  let sessionId = null;
+  let resumeId = null;
+  let lastAudioAnalysis = null;
+  let mediaRecorder = null;
+  let audioChunks = [];
+  let isRecording = false;
+  let recordingStream = null;
+
+  const chatArea = document.getElementById('chatArea');
+  const inputArea = document.getElementById('inputArea');
+  const messageInput = document.getElementById('messageInput');
+  const sendBtn = document.getElementById('sendBtn');
+  const endBtn = document.getElementById('endBtn');
+  const startBtn = document.getElementById('startBtn');
+  const micBtn = document.getElementById('micBtn');
+
+  const positionSelect = document.getElementById('positionSelect');
+  const styleSelect = document.getElementById('styleSelect');
+  const resumeFile = document.getElementById('resumeFile');
+  const uploadBtn = document.getElementById('uploadBtn');
+  const uploadStatus = document.getElementById('uploadStatus');
+
+  const sessionStatus = document.getElementById('sessionStatus');
+  const analysisIndicator = document.getElementById('analysisIndicator');
+  const audioSummary = document.getElementById('audioSummary');
+  const reportPanel = document.getElementById('reportPanel');
+  const reportContent = document.getElementById('reportContent');
+
+  const sPosition = document.getElementById('sPosition');
+  const sStyle = document.getElementById('sStyle');
+  const sResume = document.getElementById('sResume');
+  const sSession = document.getElementById('sSession');
+
+  // ===== 主题（与主页面一致的 localStorage key） =====
+  const themeToggle = document.getElementById('themeToggle');
+  const themeToggleText = document.getElementById('themeToggleText');
+
+  function updateThemeBtnText(){
+    const theme = document.documentElement.getAttribute('data-theme') || 'light';
+    themeToggleText.textContent = theme === 'light' ? '深色模式' : '浅色模式';
+  }
+  function applyTheme(theme){
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('theme', theme);
+    updateThemeBtnText();
+  }
+  const savedTheme = localStorage.getItem('theme');
+  const preferredDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  applyTheme(savedTheme || (preferredDark ? 'dark' : 'light'));
+  themeToggle.addEventListener('click', () => {
+    const cur = document.documentElement.getAttribute('data-theme') || 'light';
+    applyTheme(cur === 'light' ? 'dark' : 'light');
+  });
+
+  // ===== UI helpers =====
+  function setSessionStatus(type, text){
+    sessionStatus.className = 'status';
+    if (type) sessionStatus.classList.add(type);
+    sessionStatus.textContent = text;
+  }
+
+  function playTtsAudio(src){
+    if(!src) return;
+    try{
+      const audio = new Audio(src);
+      audio.play().catch(err=>console.warn('TTS 播放失败', err));
+    }catch(err){
+      console.warn('TTS 播放失败', err);
+    }
+  }
+
+  // Play chunked audio sequentially (edge-tts may return multiple MP3 segments).
+  let ttsPlayToken = 0;
+  async function playTtsQueue(list){
+    const token = ++ttsPlayToken;
+    for (const src of (list || [])){
+      if (token !== ttsPlayToken) return; // interrupted by a newer TTS request
+      await new Promise(resolve => {
+        try{
+          const a = new Audio(src);
+          a.onended = resolve;
+          a.onerror = resolve;
+          a.play().catch(()=>resolve());
+        }catch(e){
+          resolve();
+        }
+      });
+    }
+  }
+
+  async function requestTts(text){
+    const t = (text || '').trim();
+    if(!t) return;
+    try{
+      const res = await fetch(`${API_BASE}/tts`, {
+        method:'POST',
+        headers:{ 'Content-Type':'application/json' },
+        body: JSON.stringify({ text: t })
+      });
+      const data = await res.json();
+      if(res.ok && data.success){
+        if (Array.isArray(data.audio_list) && data.audio_list.length){
+          playTtsQueue(data.audio_list);
+        } else if (data.audio){
+          playTtsAudio(data.audio);
+        }
+      }
+    }catch(err){
+      // TTS is optional; ignore failures to keep the chat responsive.
+      console.warn('TTS 请求失败', err);
+    }
+  }
+
+  function addMessage(text, role='bot'){
+    const msg = document.createElement('div');
+    msg.className = 'msg ' + role;
+    msg.innerHTML = `<div class="bubble"></div><div class="meta">${role === 'bot' ? '面试官' : '我'}</div>`;
+    msg.querySelector('.bubble').innerText = text;
+    chatArea.appendChild(msg);
+    chatArea.scrollTop = chatArea.scrollHeight;
+  }
+
+  function setInputEnabled(enabled){
+    messageInput.disabled = !enabled;
+    sendBtn.disabled = !enabled;
+    endBtn.disabled = !enabled;
+    micBtn.disabled = !enabled;
+  }
+
+  function resetChat(){
+    chatArea.innerHTML = '';
+    addMessage('你好！点击“开始面试”，我将根据岗位与你进行模拟面试。', 'bot');
+  }
+
+  function updateAudioView(analysis){
+    if (analysis && analysis.confidence !== undefined){
+      const conf = Math.round(analysis.confidence * 100);
+      const rate = analysis.speaking_rate ?? '-';
+      analysisIndicator.textContent = `自信度 ${conf}% · 语速 ${rate}字/秒`;
+      audioSummary.innerHTML = `
+        <div class="kv"><span>自信度</span><span>${conf}%</span></div>
+        <div class="kv"><span>语速</span><span>${rate} 字/秒</span></div>
+      `;
+    }else{
+      analysisIndicator.textContent = '';
+      audioSummary.textContent = '暂无语音分析数据';
+    }
+  }
+
+  // ===== 上传简历 =====
+  uploadBtn.addEventListener('click', async ()=>{
+    const file = resumeFile.files[0];
+    if (!file) return alert('请先选择文件');
+
+    const fd = new FormData();
+    fd.append('file', file);
+
+    uploadBtn.disabled = true;
+    uploadStatus.textContent = '上传中...';
+
+    try{
+      const res = await fetch(`${API_BASE}/upload-resume`, { method:'POST', body:fd });
+      const data = await res.json();
+      if (res.ok && data.success){
+        resumeId = data.resume_id;
+        uploadStatus.textContent = `✅ 已上传：${data.filename}`;
+        sResume.textContent = '已上传';
+      }else{
+        uploadStatus.textContent = `❌ 上传失败：${data.message || '未知错误'}`;
+      }
+    }catch(err){
+      uploadStatus.textContent = `❌ 网络错误：${err.message}`;
+    }finally{
+      uploadBtn.disabled = false;
+    }
+  });
+
+  // ===== 开始面试 =====
+  startBtn.addEventListener('click', async ()=>{
+    const position = positionSelect.value;
+    const style = styleSelect.value;
+
+    resetChat();
+    reportPanel.style.display = 'none';
+    inputArea.classList.add('hidden');
+    startBtn.disabled = true;
+    startBtn.textContent = '启动中...';
+
+    sPosition.textContent = position;
+    sStyle.textContent = style;
+    setSessionStatus('', '准备中...');
+
+    try{
+      const res = await fetch(`${API_BASE}/interview/start`, {
+        method:'POST',
+        headers:{ 'Content-Type':'application/json' },
+        body: JSON.stringify({
+          resume_id: resumeId || undefined,
+          position,
+          interview_style: style
+        })
+      });
+      const data = await res.json();
+
+      if (res.ok && data.success){
+        sessionId = data.session_id;
+        sSession.textContent = sessionId;
+        addMessage(data.message || '面试已开始，请先做自我介绍。', 'bot');
+        if (data.audio) playTtsAudio(data.audio);
+        else requestTts(data.message);
+        inputArea.classList.remove('hidden');
+        setInputEnabled(true);
+        setSessionStatus('running', '进行中');
+        lastAudioAnalysis = null;
+        updateAudioView(null);
+      }else{
+        setSessionStatus('ended', '启动失败');
+        alert('启动失败：' + (data.message || '未知错误'));
+      }
+    }catch(err){
+      setSessionStatus('ended', '网络异常');
+      alert('网络异常：' + err.message);
+    }finally{
+      startBtn.disabled = false;
+      startBtn.textContent = '开始面试';
+    }
+  });
+
+  // ===== 发送文本 =====
+  async function sendMessage(){
+    const text = messageInput.value.trim();
+    if (!text || !sessionId) return;
+
+    addMessage(text, 'me');
+    messageInput.value = '';
+    setInputEnabled(false);
+
+    const payload = { session_id: sessionId, message: text };
+    if (lastAudioAnalysis) payload.analysis = lastAudioAnalysis;
+
+    try{
+      const res = await fetch(`${API_BASE}/interview/message`, {
+        method:'POST',
+        headers:{ 'Content-Type':'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      if (res.ok && data.success){
+        addMessage(data.response || '收到。我们继续下一题。', 'bot');
+        if (data.audio) playTtsAudio(data.audio);
+        else requestTts(data.response);
+      }else{
+        addMessage(`⚠️ 发送失败：${data.message || '未知错误'}`, 'bot');
+      }
+    }catch(err){
+      addMessage(`⚠️ 网络错误：${err.message}`, 'bot');
+    }finally{
+      setInputEnabled(true);
+      lastAudioAnalysis = null;
+      updateAudioView(null);
+      messageInput.focus();
+    }
+  }
+  sendBtn.addEventListener('click', sendMessage);
+  messageInput.addEventListener('keydown', (e)=>{ if(e.key === 'Enter') sendMessage(); });
+
+  // ===== 语音录制 =====
+  async function startRecording(){
+    if (!sessionId) return alert('请先开始面试');
+    if (isRecording) return;
+
+    try{
+      recordingStream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true,
+          channelCount: 1
+        }
+      });
+      const preferredTypes = [
+        'audio/webm;codecs=opus',
+        'audio/ogg;codecs=opus',
+        'audio/webm'
+      ];
+      const mimeType = preferredTypes.find(t => window.MediaRecorder && MediaRecorder.isTypeSupported(t)) || '';
+      const options = {
+        ...(mimeType ? { mimeType } : {}),
+        audioBitsPerSecond: 128000
+      };
+      mediaRecorder = new MediaRecorder(recordingStream, options);
+      audioChunks = [];
+      const startedAt = Date.now();
+      mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+      mediaRecorder.onstop = async ()=>{
+        recordingStream.getTracks().forEach(t=>t.stop());
+        recordingStream = null;
+        const durationMs = Date.now() - startedAt;
+        if (durationMs < 1200){
+          alert('录音太短（<1.2秒），请按住说完整一句再松开。');
+          return;
+        }
+        const blob = new Blob(audioChunks, { type: mimeType || 'audio/webm' });
+        await uploadAudio(blob);
+      };
+      mediaRecorder.start(250);
+      isRecording = true;
+      micBtn.classList.add('recording');
+    }catch(err){
+      alert('无法使用麦克风：' + err.message);
+    }
+  }
+
+  function stopRecording(){
+    if (mediaRecorder && isRecording){
+      mediaRecorder.stop();
+      isRecording = false;
+      micBtn.classList.remove('recording');
+    }
+  }
+
+  async function uploadAudio(blob){
+    const temp = document.createElement('div');
+    temp.className = 'msg me';
+    temp.dataset.temp = '1';
+    temp.innerHTML = `<div class="bubble">🎤 语音识别中...</div><div class="meta">我</div>`;
+    chatArea.appendChild(temp);
+    chatArea.scrollTop = chatArea.scrollHeight;
+
+    const fd = new FormData();
+    fd.append('file', blob, 'recording.webm');
+
+    try{
+      const res = await fetch(`${API_BASE}/upload-audio`, { method:'POST', body:fd });
+      const data = await res.json();
+      const t = chatArea.querySelector('[data-temp="1"]');
+      if(t) t.remove();
+
+      if (res.ok && data.success){
+        messageInput.value = data.text || '';
+        lastAudioAnalysis = data.analysis || null;
+        updateAudioView(lastAudioAnalysis);
+      }else{
+        throw new Error(data.message || '识别失败');
+      }
+    }catch(err){
+      const t = chatArea.querySelector('[data-temp="1"]');
+      if(t) t.remove();
+      alert('语音识别失败：' + err.message);
+    }
+  }
+
+  micBtn.addEventListener('mousedown', e=>{ e.preventDefault(); if(!micBtn.disabled) startRecording(); });
+  micBtn.addEventListener('mouseup', stopRecording);
+  micBtn.addEventListener('mouseleave', stopRecording);
+  micBtn.addEventListener('touchstart', e=>{ e.preventDefault(); if(!micBtn.disabled) startRecording(); });
+  micBtn.addEventListener('touchend', stopRecording);
+  micBtn.addEventListener('touchcancel', stopRecording);
+
+  // ===== 结束并生成报告 =====
+  endBtn.addEventListener('click', async ()=>{
+    if (!sessionId) return;
+
+    setInputEnabled(false);
+    endBtn.disabled = true;
+
+    try{
+      const reportRes = await fetch(`${API_BASE}/interview/report/${sessionId}`);
+      if (reportRes.ok){
+        const report = await reportRes.json();
+        renderReport(report);
+        reportPanel.style.display = 'block';
+      }
+
+      await fetch(`${API_BASE}/interview/end`, {
+        method:'POST',
+        headers:{ 'Content-Type':'application/json' },
+        body: JSON.stringify({ session_id: sessionId })
+      });
+    }catch(err){
+      alert('结束面试失败：' + err.message);
+    }finally{
+      sessionId = null;
+      sSession.textContent = '-';
+      inputArea.classList.add('hidden');
+      setSessionStatus('ended', '已结束');
+      endBtn.disabled = false;
+      lastAudioAnalysis = null;
+      updateAudioView(null);
+    }
+  });
+
+  function renderReport(report){
+    const dims = report.dimension_scores || {};
+    const dimMap = {
+      technical_accuracy:'技术正确性',
+      depth:'知识深度',
+      logic:'逻辑严谨性',
+      fit:'岗位匹配度',
+      communication:'沟通表达'
+    };
+
+    let html = `
+      <div class="score-box">
+        <div style="font-size:13px;color:var(--sub);margin-bottom:6px;">综合评分</div>
+        <div style="font-size:30px;font-weight:700;">${(report.overall_score || 0).toFixed(1)} <span style="font-size:13px;color:var(--sub)">/ 5.0</span></div>
+      </div>
+      <div class="score-box">
+        <div style="font-size:13px;color:var(--sub);margin-bottom:6px;">维度得分</div>
+    `;
+    for (const [k,v] of Object.entries(dims)){
+      html += `<div class="score-item"><span>${dimMap[k] || k}</span><strong>${Number(v).toFixed(1)}</strong></div>`;
+    }
+    html += `</div>`;
+
+    const strengths = report.top_strengths || [];
+    const weaknesses = report.top_weaknesses || [];
+    const suggestions = report.improvement_suggestions || [];
+
+    html += `
+      <div class="score-box"><div style="margin-bottom:6px;">💪 亮点</div>${strengths.length ? strengths.map(s=>`<span class="tag">${s}</span>`).join('') : '无'}</div>
+      <div class="score-box"><div style="margin-bottom:6px;">📉 待改进</div>${weaknesses.length ? weaknesses.map(s=>`<span class="tag">${s}</span>`).join('') : '无'}</div>
+      <div class="score-box">
+        <div style="margin-bottom:6px;">📚 建议</div>
+        <ul style="margin:0;padding-left:18px;">
+          ${(suggestions.slice(0,5).map(s=>`<li style="margin:4px 0">${s}</li>`).join('')) || '<li>暂无</li>'}
+        </ul>
+      </div>
+    `;
+
+    reportContent.innerHTML = html;
+  }
+
+  // init
+  setInputEnabled(false);
+  setSessionStatus('', '未开始');
+  sPosition.textContent = positionSelect.value;
+  sStyle.textContent = styleSelect.value;
+
+  window.addEventListener('beforeunload', ()=>{
+    if(recordingStream) recordingStream.getTracks().forEach(t=>t.stop());
+  });
+})();
+</script>
+</body>
+</html>

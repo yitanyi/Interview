@@ -1,0 +1,417 @@
+{
+  "Java后端开发工程师": {
+    "技术知识点": [
+      {
+        "name": "JVM内存模型与调优实战",
+        "url": "https://developer.aliyun.com/article/1714164",
+        "type": "文章",
+        "reason": "深入理解堆、栈、方法区，掌握GC日志分析与OOM定位"
+      },
+      {
+        "name": "并发编程JUC包源码解析",
+        "url": "https://blog.csdn.net/weixin_42148384/article/details/148643163",
+        "type": "文章",
+        "reason": "CountDownLatch、CyclicBarrier、Semaphore源码级应用"
+      },
+      {
+        "name": "Spring Boot自动配置原理",
+        "url": "https://zhuanlan.zhihu.com/p/2009985631074416304",
+        "type": "文章",
+        "reason": "从@EnableAutoConfiguration到spring.factories，手写自定义Starter"
+      },
+      {
+        "name": "Kafka消息队列实战",
+        "url": "https://www.bilibili.com/video/BV1Y6xNzDEah/?vd_source=73061b44e8d932b4ecc5b928f60ae26e",
+        "type": "视频",
+        "reason": "acks=all、ISR机制、手动提交偏移量，保证消息不丢失"
+      },
+      {
+        "name": "MySQL索引优化与执行计划分析",
+        "url": "https://developer.baidu.com/article/detail.html?id=6102741",
+        "type": "文章",
+        "reason": "B+树原理、索引失效场景、EXPLAIN输出字段解读"
+      },
+      {
+        "name": "Redis高并发缓存架构",
+        "url": "https://zhuanlan.zhihu.com/p/1999892953968174036",
+        "type": "文章",
+        "reason": "缓存穿透/击穿/雪崩解决方案，分布式锁实现"
+      },
+      {
+        "name": "分布式事务Seata实战",
+        "url": "https://www.bilibili.com/video/BV1XtMyznEnb/?vd_source=73061b44e8d932b4ecc5b928f60ae26e",
+        "type": "视频",
+        "reason": "TCC模式、AT模式适用场景对比"
+      },
+      {
+        "name": "Netty线程模型与零拷贝",
+        "url": "https://blog.csdn.net/didi558/article/details/124297913",
+        "type": "文章",
+        "reason": "Reactor模式、EventLoop源码解析"
+      },
+      {
+        "name": "设计模式在Spring中的应用",
+        "url": "https://javaguide.cn/system-design/framework/spring/spring-design-patterns-summary.html",
+        "type": "文章",
+        "reason": "单例、工厂、代理、观察者模式源码级分析"
+      }
+    ],
+    "沟通技巧": [
+      {
+        "name": "STAR法则回答行为面试题",
+        "url": "https://zhuanlan.zhihu.com/p/704119551",
+        "type": "文章",
+        "reason": "用STAR结构清晰表达项目难点与成果"
+      },
+      {
+        "name": "技术面试中的表达逻辑训练",
+        "url": "https://www.bilibili.com/list/ml2878187545?oid=485022417&bvid=BV1yT411H7YK",
+        "type": "视频",
+        "reason": "结论先行、分层论述，避免表达混乱"
+      },
+      {
+        "name": "如何优雅地解释技术难点",
+        "url": "https://blog.51cto.com/u_16175513/12172059",
+        "type": "文章",
+        "reason": "用类比和分层拆解让面试官听懂你的深度"
+      }
+    ]
+  },
+  "Web前端开发工程师": {
+    "技术知识点": [
+      {
+        "name": "浏览器渲染原理与性能优化",
+        "url": "https://zhuanlan.zhihu.com/p/18743440736",
+        "type": "文章",
+        "reason": "重绘回流、关键渲染路径、首屏优化"
+      },
+      {
+        "name": "JavaScript闭包与作用域链",
+        "url": "https://developer.baidu.com/article/detail.html?id=4626775",
+        "type": "文章",
+        "reason": "从执行上下文到闭包内存泄漏，手写实现"
+      },
+      {
+        "name": "React Fiber架构原理",
+        "url": "https://xypisces.github.io/guide/fiber.html",
+        "type": "文章",
+        "reason": "时间切片、任务调度、双缓存机制"
+      },
+      {
+        "name": "Vue3响应式原理与Composition API",
+        "url": "https://blog.csdn.net/qq_46193451/article/details/114704778",
+        "type": "文章",
+        "reason": "Proxy实现响应式、ref和reactive区别"
+      },
+      {
+        "name": "浏览器缓存策略",
+        "url": "https://developer.aliyun.com/article/1651590",
+        "type": "文章",
+        "reason": "强缓存、协商缓存、缓存更新机制"
+      },
+      {
+        "name": "Webpack构建优化",
+        "url": "https://blog.csdn.net/weixin_45242865/article/details/158702737",
+        "type": "文章",
+        "reason": "Loader和Plugin原理、热更新实现、代码分割"
+      },
+      {
+        "name": "TypeScript高级类型",
+        "url": "https://www.tslang.cn/docs/handbook/advanced-types.html",
+        "type": "文章",
+        "reason": "泛型、类型守卫、映射类型、条件类型"
+      },
+      {
+        "name": "前端安全XSS与CSRF防护",
+        "url": "https://blog.csdn.net/haohaizi_liu/article/details/154494455",
+        "type": "文章",
+        "reason": "攻击原理与防御方案、CSP策略"
+      },
+      {
+        "name": "微前端架构实践",
+        "url": "https://zhuanlan.zhihu.com/p/1914382914768078598",
+        "type": "文章",
+        "reason": "qiankun框架原理、应用隔离、通信机制"
+      }
+    ],
+    "沟通技巧": [
+      {
+        "name": "前端技术方案设计表达",
+        "url": "https://blog.csdn.net/xgangzai/article/details/122150885",
+        "type": "文章",
+        "reason": "技术选型对比、架构图绘制、方案评审要点"
+      },
+      {
+        "name": "与后端、产品的高效沟通",
+        "url": "https://worktile.com/kb/p/3700088",
+        "type": "文章",
+        "reason": "需求澄清、接口联调、进度同步技巧"
+      },
+      {
+        "name": "代码Review中的表达艺术",
+        "url": "https://zhuanlan.zhihu.com/p/268749337",
+        "type": "文章",
+        "reason": "如何提出建设性意见、接受反馈的心态"
+      }
+    ]
+  },
+  "Python算法工程师": {
+    "技术知识点": [
+      {
+        "name": "机器学习正则化详解",
+        "url": "https://blog.csdn.net/Zlyzjiabjw547479/article/details/149189783",
+        "type": "文章",
+        "reason": "L1/L2正则化原理、 dropout、早停法"
+      },
+      {
+        "name": "Transformer与Self-Attention",
+        "url": "https://zhuanlan.zhihu.com/p/1916132904305664134",
+        "type": "文章",
+        "reason": "多头注意力机制、位置编码、BERT/GPT架构"
+      },
+      {
+        "name": "Python数据结构与算法",
+        "url": "https://www.icourse163.org/course/WHUT-1206307812",
+        "type": "视频",
+        "reason": "列表、堆栈、队列、二叉树、动态规划"
+      },
+      {
+        "name": "LeetCode高频题解",
+        "url": "https://blog.csdn.net/weixin_53920044/article/details/149228585",
+        "type": "文章",
+        "reason": "双指针、滑动窗口、回溯、动态规划分类解析"
+      },
+      {
+        "name": "系统设计：高并发架构",
+        "url": "https://zhuanlan.zhihu.com/p/597249336",
+        "type": "文章",
+        "reason": "秒杀系统、短链服务、分布式锁设计"
+      },
+      {
+        "name": "机器学习系统设计",
+        "url": "https://openmlsys.github.io/index.html",
+        "type": "文章",
+        "reason": "推荐系统、搜索排序、模型服务化"
+      },
+      {
+        "name": "PyTorch源码解析",
+        "url": "https://github.com/pytorch/pytorch",
+        "type": "文章",
+        "reason": "自动求导机制、模型保存与加载、分布式训练"
+      },
+      {
+        "name": "特征工程实战",
+        "url": "https://blog.csdn.net/CarryLvan/article/details/106797353",
+        "type": "文章",
+        "reason": "数值型/类别型特征处理、特征交叉、降维"
+      },
+      {
+        "name": "模型评估与调参",
+        "url": "https://cloud.tencent.com/developer/article/2459289",
+        "type": "文章",
+        "reason": "交叉验证、AUC/ROC、超参数优化"
+      }
+    ],
+    "沟通技巧": [
+      {
+        "name": "算法思路表达训练",
+        "url": "https://zhuanlan.zhihu.com/p/1936086425410967243",
+        "type": "文章",
+        "reason": "边写代码边缕清思路、时间空间复杂度分析"
+      },
+      {
+        "name": "项目成果汇报技巧",
+        "url": "https://blog.51cto.com/u_16175451/13229770",
+        "type": "文章",
+        "reason": "从业务问题到技术方案、落地效果量化"
+      }
+    ]
+  },
+  "产品经理": {
+    "技术知识点": [
+      {
+        "name": "需求分析与管理",
+        "url": "https://blog.csdn.net/weixin_28223453/article/details/158589374",
+        "type": "文章",
+        "reason": "用户访谈、KANO模型、需求优先级四象限"
+      },
+      {
+        "name": "产品设计工具：Axure/Mockplus",
+        "url": "https://blog.csdn.net/liwei16611/article/details/89226226",
+        "type": "文章",
+        "reason": "快速原型制作、交互设计、PRD撰写"
+      },
+      {
+        "name": "数据分析AARRR模型",
+        "url": "https://zhuanlan.zhihu.com/p/520771211",
+        "type": "文章",
+        "reason": "用户获取、激活、留存、变现、传播"
+      },
+      {
+        "name": "AB测试设计",
+        "url": "https://zhuanlan.zhihu.com/p/68019926",
+        "type": "文章",
+        "reason": "分流原理、显著性检验、结果分析"
+      },
+      {
+        "name": "商业模式画布",
+        "url": "https://www.zhihu.com/question/407487830",
+        "type": "文章",
+        "reason": "价值主张、客户细分、收入来源"
+      },
+      {
+        "name": "敏捷开发与Scrum",
+        "url": "https://zhuanlan.zhihu.com/p/403112162",
+        "type": "文章",
+        "reason": "用户故事、迭代计划、站立会议"
+      },
+      {
+        "name": "SQL基础与数据提取",
+        "url": "https://zhuanlan.zhihu.com/p/373368855",
+        "type": "文章",
+        "reason": "基础查询、聚合函数、多表关联"
+      }
+    ],
+    "沟通技巧": [
+      {
+        "name": "STAR法则回答面试题",
+        "url": "https://zhuanlan.zhihu.com/p/667074905",
+        "type": "文章",
+        "reason": "情境-任务-行动-结果，突出产品思维"
+      },
+      {
+        "name": "如何讲好一个产品故事",
+        "url": "https://zhuanlan.zhihu.com/p/390586992",
+        "type": "文章",
+        "reason": "从用户痛点出发，讲清楚产品价值"
+      },
+      {
+        "name": "跨部门沟通技巧",
+        "url": "https://zhuanlan.zhihu.com/p/689085752",
+        "type": "文章",
+        "reason": "与研发、设计、运营的有效协作"
+      }
+    ]
+  },
+  
+"数据分析师": {
+  "技术知识点": [
+    {
+      "name": "SQL进阶查询",
+      "url": "https://cloud.tencent.com/developer/article/1899666",
+      "type": "文章",
+      "reason": "窗口函数、CTE、查询优化、留存计算"
+    },
+    {
+      "name": "Python数据分析库Pandas",
+      "url": "https://www.bilibili.com/video/BV1hx411Q7pr",
+      "type": "视频",
+      "reason": "数据清洗、分组聚合、透视表"
+    },
+    {
+      "name": "统计学基础",
+      "url": "https://www.zhihu.com/question/19763397/answer/2679284855",
+      "type": "文章",
+      "reason": "假设检验、置信区间、p值"
+    },
+    {
+      "name": "AB测试设计与分析",
+      "url": "https://cloud.tencent.com/developer/article/1958414",
+      "type": "文章",
+      "reason": "样本量计算、实验分组、结果显著性检验"
+    },
+    {
+      "name": "用户行为分析",
+      "url": "https://www.zhihu.com/question/265762704/answer/3224376882",
+      "type": "文章",
+      "reason": "漏斗分析、留存分析、RFM模型"
+    },
+    {
+      "name": "Tableau数据可视化",
+      "url": "https://www.bilibili.com/video/BV1NE411m79P",
+      "type": "视频",
+      "reason": "仪表板制作、交互分析"
+    },
+    {
+      "name": "机器学习基础",
+      "url": "https://cloud.tencent.com/developer/article/1807086",
+      "type": "文章",
+      "reason": "回归、分类、聚类、特征工程"
+    }
+  ],
+  "沟通技巧": [
+    {
+      "name": "数据报告撰写",
+      "url": "https://www.zhihu.com/question/321400441/answer/2883938852",
+      "type": "文章",
+      "reason": "结论先行、可视化呈现、洞察提炼"
+    },
+    {
+      "name": "如何用数据说服业务方",
+      "url": "https://www.zhihu.com/question/499674253/answer/2480690702",
+      "type": "文章",
+      "reason": "从业务问题出发，用数据讲故事"
+    }
+  ]
+},
+"C++工程师": {
+  "技术知识点": [
+    {
+      "name": "指针与引用深度解析",
+      "url": "https://cloud.tencent.com/developer/article/2479615",
+      "type": "文章",
+      "reason": "汇编层面区别、const指针、智能指针实现"
+    },
+    {
+      "name": "C++内存管理",
+      "url": "https://code.ornl.gov/pnb/ADIOS2/-/wikis/RAII-Memory-Management",
+      "type": "文章",
+      "reason": "new/delete底层、内存池设计、RAII"
+    },
+    {
+      "name": "STL源码剖析",
+      "url": "https://www.bilibili.com/video/BV1db411q7B8",
+      "type": "视频",
+      "reason": "vector扩容、map红黑树、迭代器失效"
+    },
+    {
+      "name": "多线程与并发",
+      "url": "https://cloud.tencent.com/developer/article/2558970",
+      "type": "文章",
+      "reason": "mutex、condition_variable、原子操作"
+    },
+    {
+      "name": "C++11/14/17新特性",
+      "url": "https://www.tenlong.com.tw/products/9787121508608",
+      "type": "文章",
+      "reason": "智能指针、lambda、右值引用、move语义"
+    },
+    {
+      "name": "设计模式C++实现",
+      "url": "https://cloud.tencent.com/developer/article/2055554",
+      "type": "文章",
+      "reason": "单例、工厂、观察者模式源码"
+    },
+    {
+      "name": "网络编程与Reactor模型",
+      "url": "https://www.bilibili.com/video/BV1sQKoziEFt/",
+      "type": "视频",
+      "reason": "epoll、非阻塞IO、线程池设计"
+    }
+  ],
+  "沟通技巧": [
+    {
+      "name": "技术难点解释技巧",
+      "url": "https://www.kancloud.cn/epubit/hacker_and_team/311015",
+      "type": "文章",
+      "reason": "用类比解释复杂概念（如RAII）"
+    },
+    {
+      "name": "代码Review沟通",
+      "url": "https://m.yisu.com/ask/76323095.html",
+      "type": "文章",
+      "reason": "如何接受反馈、提出改进建议"
+    }
+  ]
+}
+}

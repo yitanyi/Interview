@@ -1,0 +1,118 @@
+{
+  "name": "Web前端开发工程师",
+  "tech_stack": [
+    "JavaScript (ES6+)",
+    "TypeScript",
+    "React/Vue",
+    "浏览器原理",
+    "前端工程化",
+    "性能优化"
+  ],
+  "question_bank": [
+    {
+      "id": "web_021",
+      "type": "技术知识",
+      "question": "请解释一下浏览器的渲染流程。什么是重排（Reflow）和重绘（Repaint）？如何避免不必要的重排？",
+      "answer_points": [
+        "渲染流程：构建DOM树 -> 构建CSSOM树 -> 合并成渲染树 -> 布局（重排）-> 绘制（重绘）-> 合成。",
+        "重排：改变元素尺寸、位置、增删DOM等，导致需要重新计算布局。开销大。",
+        "重绘：改变颜色、背景等不影响布局的属性。",
+        "优化：1. 使用 transform 代替 top/left。 2. 批量修改DOM（使用文档片段 fragment）。 3. 读写分离（或使用 fastdom 库）[citation:5]。 4. 开启CSS3硬件加速（will-change）。"
+      ],
+      "difficulty": 4
+    },
+    {
+      "id": "web_022",
+      "type": "技术知识",
+      "question": "Vue 的响应式原理是什么？Vue 2 和 Vue 3 在实现上有什么主要区别？",
+      "answer_points": [
+        "Vue 2：基于 Object.defineProperty，递归遍历 data 中的每个属性进行数据劫持。缺陷：无法监听属性的新增和删除（需用 $set），无法直接监听数组的变化（需重写数组方法）。",
+        "Vue 3：基于 Proxy，直接代理整个对象，可以监听动态新增的属性，性能更好且无需递归遍历。",
+        "依赖收集：在 getter 中收集依赖（Dep），在 setter 中触发更新 [citation:7]。"
+      ],
+      "difficulty": 4
+    },
+    {
+      "id": "web_023",
+      "type": "技术知识",
+      "question": "React 的 Fiber 架构主要解决了什么问题？",
+      "answer_points": [
+        "传统问题：React 15 的递归渲染（Stack Reconciler）是不可中断的，如果组件树层级深，会阻塞主线程，导致页面卡顿（掉帧）。",
+        "Fiber 解决方案：引入可中断的异步渲染。将渲染工作拆分成一个个工作单元（Fiber Node），通过链表遍历，允许浏览器在空闲时执行（requestIdleCallback）。",
+        "优先级：高优先级任务（如用户输入）可以打断低优先级任务（如数据渲染）[citation:5]。"
+      ],
+      "difficulty": 4
+    },
+    {
+      "id": "web_024",
+      "type": "场景题",
+      "question": "现在有一个包含上万条数据的列表需要展示，如何保证页面的流畅度？请设计一个虚拟列表（Virtual List）的核心逻辑。",
+      "answer_points": [
+        "原理：只渲染可视区域内的 DOM 元素。",
+        "核心变量：1. 容器高度。 2. 列表项高度。 3. 滚动位置。 计算出 startIndex 和 endIndex。",
+        "实现：监听容器的 scroll 事件，根据 scrollTop 动态计算起始索引，使用绝对定位或 padding 占位模拟滚动条。",
+        "优化：需要处理动态高度的情况，可以预存位置信息或实时测量 [citation:5]。"
+      ],
+      "difficulty": 5
+    },
+    {
+      "id": "web_025",
+      "type": "场景题",
+      "question": "前端如何保证安全性？请分别解释 XSS 和 CSRF 攻击的原理及防御措施。",
+      "answer_points": [
+        "XSS（跨站脚本攻击）：攻击者注入恶意脚本。",
+        "防御：1. 输入过滤（转义 HTML 特殊字符）。 2. 使用 CSP（内容安全策略）限制资源加载 [citation:5]。 3. 对重要 Cookie 设置 HttpOnly。",
+        "CSRF（跨站请求伪造）：诱导用户访问第三方网站，携带用户的 Cookie 发起恶意请求。",
+        "防御：1. 使用 Token（如 JWT 放在 Header 中，而非 Cookie 自动携带）。 2. 设置 SameSite 属性。 3. 验证 Referer 头。"
+      ],
+      "difficulty": 3
+    },
+    {
+      "id": "web_026",
+      "type": "项目深挖",
+      "question": "在你们的前端项目中，是如何做首屏加载优化的？具体做了哪些工作？",
+      "answer_points": [
+        "路由懒加载：将页面拆分成 chunk，按需加载。",
+        "图片优化：使用 WebP 格式，懒加载（IntersectionObserver）。",
+        "资源优化：开启 Gzip/Brotli 压缩，Tree Shaking 移除无用代码。",
+        "缓存策略：文件名哈希（强缓存），CDN 加速。",
+        "预加载：对下一个页面的资源使用 <link rel=prefetch>。"
+      ],
+      "difficulty": 4
+    },
+    {
+      "id": "web_027",
+      "type": "技术知识",
+      "question": "解释一下 JavaScript 中的事件循环（Event Loop）。宏任务和微任务有哪些？",
+      "answer_points": [
+        "执行栈：同步代码直接执行。",
+        "任务队列：异步任务完成后，回调会进入任务队列。",
+        "循环机制：执行栈清空 -> 执行所有微任务 -> 取出一个宏任务执行 -> 再清空微任务...",
+        "宏任务：setTimeout, setInterval, I/O, UI 渲染。",
+        "微任务：Promise.then, MutationObserver, async/await（await 后面的代码是微任务）[citation:5]。"
+      ],
+      "difficulty": 3
+    },
+    {
+      "id": "web_028",
+      "type": "场景题",
+      "question": "请实现一个函数，控制并发请求数量。比如最多同时发送3个请求，其余请求排队。",
+      "answer_points": [
+        "思路：维护一个队列和当前活跃数。",
+        "实现：创建一个类，接收并发数 limit。",
+        "add 方法接收 Promise 工厂函数，内部判断如果当前运行数小于 limit，则直接运行，否则加入等待队列。",
+        "请求完成后，从队列中取出下一个执行 [citation:5]。"
+      ],
+      "difficulty": 4
+    }
+  ],
+  "knowledge_base": [
+    "knowledge_base/architecture_design_patterns.md",
+    "knowledge_base/browser_rendering.md",
+    "knowledge_base/frontend_engineering_deep_dive.md",
+    "knowledge_base/frontend_performance_monitoring.md",
+    "knowledge_base/frontend_security_defense.md",
+    "knowledge_base/js_event_loop.md"
+ 
+  ]
+}

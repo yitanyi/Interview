@@ -1,0 +1,53 @@
+[DEFAULT]
+# API 提供商选择: deepseek 或 google
+provider = deepseek
+
+# 面试官风格:
+# - judge (审判型)
+# - random (随缘型)
+# - professional (专业型)
+# - guide (引导型)
+# - student (校园友好型)
+interview_style = judge
+
+[embedding]
+# Embedding 类型: local (本地免费) 或 deepseek (需API，DeepSeek暂不支持，会报错)
+# 推荐使用 local，首次运行会下载约400MB模型
+type = local
+model = sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2
+
+[api]
+# API 服务器配置
+port = 5000
+cors_enabled = true
+cors_origins = *
+
+[deepseek]
+# DeepSeek API 配置
+# 申请地址: https://platform.deepseek.com/api_keys
+api_key = your-deepseek-api-key
+base_url = https://api.deepseek.com/v1
+model = deepseek-chat
+
+[google]
+# Google Gemini API 配置
+# 申请地址: https://aistudio.google.com/apikey
+api_key = your-google-api-key
+model = gemini-2.0-flash
+
+
+# ... 其他配置 ...
+
+[ocr]
+# 阿里云OCR服务配置
+# 购买服务后，在阿里云市场获取您的AppCode
+# 注意：请勿将AppCode直接提交到公开的代码仓库
+app_code = your-aliyun-appcode-here
+# API接口地址，从商品详情页获取
+api_url = https://ocrapi-advanced.taobao.com/ocrservice/advanced  # 示例地址，请以官方文档为准
+
+[tts]
+# 文本转语音配置（基于 Edge TTS）
+voice = zh-CN-XiaoxiaoNeural
+rate = 0%
+style = general

@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Interview · 题集练习</title>
+  <style>
+    :root{
+      --bg:#f5f7fb; --panel:#fff; --text:#0f172a; --sub:#64748b; --line:#e5eaf2;
+      --primary:#2563eb; --primary-hover:#1d4ed8; --soft:#eef3fb;
+      --ok:#16a34a; --warn:#d97706; --bad:#dc2626;
+    }
+    :root[data-theme="dark"]{
+      --bg:#0b1220; --panel:#0f172a; --text:#e2e8f0; --sub:#94a3b8; --line:#1e293b;
+      --primary:#3b82f6; --primary-hover:#2563eb; --soft:#111c31;
+      --ok:#22c55e; --warn:#f59e0b; --bad:#ef4444;
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;background:var(--bg);color:var(--text);
+      font-family:Inter,"PingFang SC","Microsoft YaHei",Arial,sans-serif;
+    }
+    .container{max-width:1100px;margin:0 auto;padding:20px;}
+    .topbar,.toolbar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+    .title{margin:0;font-size:22px}
+    .sub{color:var(--sub);font-size:13px}
+    .btn{
+      border:none;border-radius:10px;height:38px;padding:0 14px;font-size:14px;
+      cursor:pointer;display:inline-flex;align-items:center;gap:6px
+    }
+    .btn.primary{background:var(--primary);color:#fff}
+    .btn.primary:hover{background:var(--primary-hover)}
+    .btn.ghost{background:var(--panel);border:1px solid var(--line);color:var(--text)}
+    .btn.sm{height:32px;padding:0 10px;font-size:13px}
+    .input,.select{
+      height:38px;border:1px solid var(--line);background:var(--panel);color:var(--text);
+      border-radius:10px;padding:0 10px;outline:none
+    }
+
+    .hero,.toolbar,.list{
+      background:var(--panel);border:1px solid var(--line);border-radius:14px
+    }
+    .hero{padding:14px;margin:12px 0}
+    .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+    .chip{font-size:12px;padding:4px 10px;border-radius:999px;background:var(--soft);color:var(--sub)}
+
+    .tabs{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+    .tab{
+      border:1px solid var(--line);background:var(--panel);color:var(--text);
+      border-radius:999px;padding:6px 12px;font-size:13px;cursor:pointer
+    }
+    .tab.active{background:#eaf1ff;color:#1d4ed8;border-color:#cdddff}
+    :root[data-theme="dark"] .tab.active{background:#1b2b4a;color:#93c5fd;border-color:#334a74}
+
+    .toolbar{padding:12px;margin-bottom:12px}
+    .list{overflow:hidden}
+    .item{
+      padding:14px;border-bottom:1px dashed var(--line);
+      display:flex;justify-content:space-between;gap:12px
+    }
+    .item:last-child{border-bottom:none}
+    .q-title{margin:0 0 6px;font-size:15px;line-height:1.45}
+    .meta{display:flex;gap:8px;flex-wrap:wrap;font-size:12px;color:var(--sub)}
+    .tag{font-size:12px;padding:2px 8px;border-radius:999px;background:var(--soft);color:var(--sub)}
+    .status{font-size:12px;padding:2px 8px;border-radius:999px}
+    .ok{background:rgba(22,163,74,.12);color:var(--ok)}
+    .bad{background:rgba(220,38,38,.12);color:var(--bad)}
+    .warn{background:rgba(217,119,6,.12);color:var(--warn)}
+    .none{background:rgba(100,116,139,.12);color:var(--sub)}
+
+    .empty{padding:30px;text-align:center;color:var(--sub)}
+
+    .mask{
+      position:fixed;inset:0;background:rgba(2,6,23,.55);display:none;
+      align-items:center;justify-content:center;padding:16px;z-index:1000
+    }
+    .modal{
+      width:min(760px,100%);max-height:90vh;overflow:auto;
+      background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px
+    }
+    .block{border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:10px;background:var(--soft)}
+    .block h4{margin:0 0 8px;font-size:14px}
+    .muted{color:var(--sub);font-size:12px}
+
+    @media(max-width:768px){ .item{flex-direction:column} }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="topbar">
+    <div>
+      <h1 class="title" id="pageTitle">题集练习</h1>
+      <div class="sub">题库练习 / 错题追踪 / 一键再练</div>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+      <button class="btn ghost" onclick="location.href='./question-bank.html'">返回题库</button>
+      <button id="themeBtn" class="btn ghost">深色模式</button>
+    </div>
+  </div>
+
+  <section class="hero">
+    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+      <label>题集：</label>
+      <select id="setSelect" class="select"></select>
+    </div>
+    <div class="chips">
+      <span class="chip" id="cRole">岗位：-</span>
+      <span class="chip" id="cCount">题目数：-</span>
+      <span class="chip" id="cProgress">完成：0%</span>
+    </div>
+  </section>
+
+  <div class="tabs">
+    <button class="tab active" data-tab="all">当前题集</button>
+    <button class="tab" data-tab="wrong">当前题集错题</button>
+    <button class="tab" data-tab="cross">跨题集错题本</button>
+  </div>
+
+  <section class="toolbar">
+    <input id="kw" class="input" placeholder="搜索关键词" />
+    <select id="diff" class="select">
+      <option value="all">全部难度</option>
+      <option value="Easy">简单</option>
+      <option value="Medium">中等</option>
+      <option value="Hard">困难</option>
+    </select>
+    <button class="btn primary" id="randomBtn">随机开始</button>
+    <button class="btn primary" id="drillBtn">一键再练</button>
+    <button class="btn ghost" id="clearSetBtn">清空当前题集记录</button>
+  </section>
+
+  <section class="list" id="list"></section>
+</div>
+
+<div class="mask" id="qMask">
+  <div class="modal">
+    <h3 id="qTitle">-</h3>
+    <div class="block"><h4>题目描述</h4><div id="qPrompt"></div></div>
+    <div class="block"><h4>参考要点</h4><div id="qAnswer"></div></div>
+    <div class="muted" id="drillHint"></div>
+    <div style="display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap;margin-top:10px;">
+      <button class="btn sm" style="background:#16a34a;color:#fff" onclick="mark('correct')">答对了</button>
+      <button class="btn sm" style="background:#dc2626;color:#fff" onclick="mark('wrong')">答错了</button>
+      <button class="btn sm" style="background:#d97706;color:#fff" onclick="mark('unknown')">未掌握</button>
+      <button class="btn ghost sm" onclick="closeQ()">关闭</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/** -----------------------
+ * 1) 接收 question-bank.html 传来的参数
+ * ---------------------- */
+const query = new URLSearchParams(location.search);
+const qCompany = query.get('company') || '通用题库';
+const qRole = query.get('role') || '通用';
+const qTitleZh = query.get('titleZh') || '题集练习';
+const qTitleEn = query.get('titleEn') || 'Question Set';
+const qCount = Math.max(5, Math.min(80, Number(query.get('count') || 20)));
+
+function makeQuestions(role, n){
+  const base = [
+    {difficulty:'Easy', title:'请做一个简短自我介绍，并突出与你申请岗位相关的经历。', answer:'建议按“背景-项目-能力-岗位匹配”结构回答。'},
+    {difficulty:'Medium', title:`你在${role}岗位中最有代表性的一个项目是什么？`, answer:'用 STAR（情境-任务-行动-结果）展开，突出量化结果。'},
+    {difficulty:'Medium', title:'遇到线上问题时你的排查思路是什么？', answer:'先止损、后定位、再修复、最后复盘。'},
+    {difficulty:'Hard', title:'如果需求紧急且资源不足，你如何做取舍？', answer:'按业务价值和风险排序，拆分 MVP，明确里程碑。'},
+    {difficulty:'Hard', title:'请讲一个你推动跨团队协作的案例。', answer:'目标对齐、责任边界、同步机制、风险管理。'}
+  ];
+  return Array.from({length:n}, (_,i)=>{
+    const t = base[i % base.length];
+    return { id:i+1, difficulty:t.difficulty, title:`[${role}] ${t.title}（${i+1}）`, answer:t.answer };
+  });
+}
+
+// 判断是否为字节跳动产品AI模拟真题
+const isByteDanceProduct = qCompany === '字节跳动' && qRole === 'Product' && qTitleZh.includes('产品AI模拟真题');
+// ✅ 新增：如果是算法工程师岗位，使用自定义算法真题（覆盖所有公司）
+const isAlgorithmRole = qRole === 'Algorithm';
+const isDataAnalystRole = qRole === 'Data' || qRole.includes('数据分析') || qRole.includes('Data Analyst');
+
+let questions;
+if (isAlgorithmRole) {
+    // 自定义的算法工程师真题，包含各大厂经典题目
+    questions = [
+        { id: 1, difficulty: 'Medium', title: '请简述逻辑回归的基本原理，并推导其损失函数对参数的梯度。', answer: '逻辑回归假设数据服从伯努利分布，通过sigmoid函数将线性组合映射到[0,1]。损失函数为交叉熵损失。梯度推导：∂L/∂θ = (y_hat - y) * x。具体地，对于单个样本，损失L = -[y log y_hat + (1-y) log (1-y_hat)]，其中y_hat = σ(θ^T x)，则∂L/∂θ = (y_hat - y) x。' },
+        { id: 2, difficulty: 'Medium', title: 'LSTM是如何解决传统RNN梯度消失问题的？请结合门结构说明。', answer: 'LSTM通过遗忘门、输入门、输出门控制信息流动。细胞状态c_t可以保持长时记忆，梯度可以通过c_t的加法运算直接传播，避免了反复乘以小权重导致的梯度消失。遗忘门控制历史信息的保留，输入门控制新信息的加入，输出门控制隐藏状态输出。' },
+        { id: 3, difficulty: 'Easy', title: '什么是AUC？它有什么物理意义？如何计算？', answer: 'AUC是ROC曲线下的面积，表示随机选择一个正样本和一个负样本，正样本得分高于负样本的概率。计算时，将所有样本按预测得分排序，统计正样本排名高于负样本的对数占比。' },
+        { id: 4, difficulty: 'Medium', title: '请描述PCA（主成分分析）的算法步骤，并说明主成分的选取方法。', answer: '步骤：1.数据标准化；2.计算协方差矩阵；3.计算协方差矩阵的特征值和特征向量；4.按特征值降序排列特征向量；5.选择前k个特征向量组成投影矩阵。主成分选取方法：累积方差贡献率（前k个特征值之和占总特征值之和的比例）达到某一阈值（如85%），或根据碎石图拐点。' },
+        { id: 5, difficulty: 'Hard', title: '请写出Adaboost算法的伪代码，并解释其工作原理。', answer: '初始化样本权重w_i=1/N。迭代m=1..M：训练弱分类器G_m，计算加权错误率err_m，计算分类器权重α_m=0.5*ln((1-err_m)/err_m)，更新样本权重w_i = w_i * exp(-α_m * y_i * G_m(x_i))，归一化。最终强分类器为G(x)=sign(sum α_m G_m(x))。工作原理：通过调整样本权重，使后续分类器关注之前分错的样本。' },
+        { id: 6, difficulty: 'Medium', title: 'Batch Normalization的作用是什么？它在训练和推理阶段有何不同？', answer: '作用：加速收敛、缓解梯度消失、允许更大学习率、有一定正则化效果。训练时使用当前mini-batch的均值和方差进行归一化，并学习缩放和平移参数γ、β。推理时使用全局统计量（移动平均得到的均值和方差）进行归一化，γ、β固定。' },
+        { id: 7, difficulty: 'Easy', title: 'ReLU激活函数有什么优缺点？相比于Sigmoid函数，它在哪些方面更优？', answer: '优点：计算简单（max(0,x)）、缓解梯度消失（正区间梯度恒为1）、产生稀疏性。缺点：神经元死亡（负数部分梯度为0）。相比Sigmoid，ReLU无饱和区，梯度不衰减，计算更快。' },
+        { id: 8, difficulty: 'Medium', title: 'LeetCode 200：岛屿数量。请描述解题思路，并给出代码（可用伪代码）。', answer: '思路：遍历网格每个格子，若为1则计数加1，并通过DFS或BFS将与之相连的所有1置为0。DFS递归实现，注意边界条件。时间复杂度O(m*n)，空间复杂度O(m*n)（递归栈）。' },
+        { id: 9, difficulty: 'Hard', title: '在一个行和列均升序的矩阵中，如何找到第k小的数？请说明算法思路。', answer: '方法一：最小堆。将第一列元素入堆，每次弹出最小值，并将该元素所在行的下一个元素入堆，重复k次。方法二：二分查找。在值域[min, max]内二分，统计矩阵中≤mid的元素个数，若小于k则提高下界，否则降低上界。' },
+        { id: 10, difficulty: 'Hard', title: '如何处理海量数据中找出出现频率最高的Top K个元素？请给出方案。', answer: '分治+堆：将数据哈希到多个小文件，每个文件统计词频得到局部Top K，然后合并所有局部Top K到一个堆中，得到全局Top K。也可以使用外部排序+堆，或使用近似算法如Count-Min Sketch。' },
+        { id: 11, difficulty: 'Medium', title: '一副扑克牌（大小王各一张，共54张），随机分成三份，求大小王在同一份的概率。', answer: '解法一：先固定大王位置，小王与大王同份的概率为(17/53)，因为大王所在份除大王外还有17张牌的位置，总剩余53张。解法二：组合数计算，分母为54张分成三份的分法数（但注意分法可能涉及有序无序），简化理解即可。' },
+        { id: 12, difficulty: 'Medium', title: 'Python中字典的底层数据结构是什么？它如何解决哈希冲突？', answer: 'Python字典基于哈希表实现，采用开放寻址法（open addressing）解决冲突。当发生哈希冲突时，通过二次探测（如(初始位置 + i*i) mod 表长）寻找下一个空闲位置。' },
+        { id: 13, difficulty: 'Hard', title: '请解释Transformer模型中Self-Attention的计算过程，并说明为何要使用缩放点积。', answer: '对于输入序列，通过三个线性变换得到Q、K、V。注意力分数 = softmax(QK^T / √d_k) V。缩放因子√d_k是为了防止点积过大导致softmax梯度极小（因为d_k较大时点积方差大）。' },
+        { id: 14, difficulty: 'Easy', title: '在训练深度神经网络时，过拟合的常见解决方法有哪些？', answer: '1.增加训练数据；2.正则化（L1/L2）；3.Dropout；4.早停；5.简化模型结构；6.数据增强；7.Batch Normalization（有一定正则化效果）；8.集成学习。' },
+        { id: 15, difficulty: 'Medium', title: 'LeetCode 121/122：股票买卖的最佳时机。请说明不同限制条件下的解题思路。', answer: '121（单次交易）：遍历价格，记录历史最低点，计算当前价格与最低点的最大差值。122（无限次交易）：贪心，只要今天价格高于昨天就累加差值。' }
+    ];
+} else if (isByteDanceProduct) {
+    // 自定义的6道字节跳动产品真题，附带参考答案
+    questions = [{
+      id: 1,
+      difficulty: 'Medium',
+      title: '为什么转行做产品，你的职业思考是什么？成绩好为什么不继续，而要跨到新领域？',
+      answer: '参考答案要点：\n' +
+        '1. 阐述对产品工作的理解（例如：产品是技术与商业的结合，能更直接地创造用户价值）；\n' +
+        '2. 结合自身背景说明转型原因（例如：技术背景让我更懂实现，但希望通过产品视角解决更大问题）；\n' +
+        '3. 强调学习能力和适应力（例如：成绩好说明学习能力强，能快速掌握新领域知识）；\n' +
+        '4. 展示对产品工作的热情和长期规划。'
+    },
+    {
+      id: 2,
+      difficulty: 'Medium',
+      title: '从你的视角看，产品经理岗位最重要的三个能力特质是什么？',
+      answer: '参考答案要点：\n' +
+        '1. 同理心：能够站在用户角度思考，洞察真实需求；\n' +
+        '2. 逻辑思维：能将复杂问题拆解为可执行的方案，梳理业务闭环；\n' +
+        '3. 沟通协调：能推动跨团队合作，让研发、设计、运营等达成共识。'
+    },
+    {
+      id: 3,
+      difficulty: 'Medium',
+      title: '在一个产品从研发洞察到规划设计再到上线的过程中，产品经理最重要的三个职能是什么？',
+      answer: '参考答案要点：\n' +
+        '1. 需求挖掘与验证：通过用户调研、数据分析等手段找到真实痛点；\n' +
+        '2. 方案设计与优先级决策：产出清晰的产品方案，平衡资源与价值，确定迭代节奏；\n' +
+        '3. 项目管理与上线跟进：协调各方进度，把控质量，确保产品顺利上线并跟踪效果。'
+    },
+    {
+      id: 4,
+      difficulty: 'Medium',
+      title: '请介绍一下让你觉得比较有成就感的一段经历，讲一讲这段经历你当时做了一件什么样的事情，你的一个主要职责是什么，然后最后的效果是什么样子的？',
+      answer: '参考答案要点：\n' +
+        '建议使用STAR法则：\n' +
+        '- 情境（Situation）：什么背景，遇到了什么问题；\n' +
+        '- 任务（Task）：你的目标是什么，负责什么；\n' +
+        '- 行动（Action）：你具体做了什么，如何推动；\n' +
+        '- 结果（Result）：取得了哪些量化成果（如用户增长xx%，效率提升xx%）。'
+    },
+    {
+      id: 5,
+      difficulty: 'Hard',
+      title: '如果要实现AI自动生成SQL数据分析代码这件事，它的核心难点以及大概的技术实现方案是什么？追问：如果你是产品的owner，设计这个AI自动生成SQL代码的场景，这款产品要解决的核心业务问题是什么，核心优势是什么？这款产品的主要用户你觉得会是谁？如果做这款AI生成SQL代码的工具，从技术角度和产品角度分别讲一下核心优势是什么？',
+      answer: '参考答案要点：\n' +
+        '**核心难点**：自然语言到SQL的语义理解、复杂查询的生成、多表关联、性能优化、用户意图澄清。\n' +
+        '**技术方案**：基于大语言模型（如LLM）微调，结合数据库Schema信息，通过Prompt Engineering引导生成，辅以后端语法校验和执行计划优化。\n' +
+        '**核心业务问题**：降低数据分析门槛，让业务人员能自助取数，减少对数据团队的依赖。\n' +
+        '**核心优势**：\n' +
+        '  - 技术：准确率高、支持复杂查询、实时响应；\n' +
+        '  - 产品：交互自然、可解释性强、支持迭代反馈。\n' +
+        '**主要用户**：业务分析师、运营人员、产品经理等非技术角色。\n' +
+        '**技术角度优势**：模型可快速适配不同数据库方言，持续学习用户修正。\n' +
+        '**产品角度优势**：提供可视化调试界面，让用户能验证和修正生成的SQL，建立信任。'
+    },
+    {
+      id: 6,
+      difficulty: 'Hard',
+      title: '数据平台需为内部（抖音、电商）与外部（火山引擎客户）提供解决方案，结合你的思考，你认为面向内部业务线的产品设计与面向外部 B 端客户的商业化产品设计，在需求优先级、功能颗粒度上有哪些核心差异？若需将一款内部验证过的 大模型数据标注工具 推向外部市场，你会做哪些适配调整？追问1：调整过程中，若内部业务线要求优先迭代 满足自身紧急需求的功能，而外部客户急需 商业化适配功能，你会如何协调资源？',
+      answer: '参考答案要点：\n' +
+        '**核心差异**：\n' +
+        '- 内部产品：优先满足核心业务需求，功能可定制化、快速迭代，文档和易用性要求相对低；\n' +
+        '- 外部产品：需要通用性、稳定性、完善文档、多租户隔离、计费体系、SLA保障。\n' +
+        '**推向外部市场的适配调整**：\n' +
+        '1. 抽象通用能力，去除内部强耦合依赖；\n' +
+        '2. 完善权限管理和数据隔离；\n' +
+        '3. 增加计费/计量模块；\n' +
+        '4. 提供详尽的使用文档和示例；\n' +
+        '5. 建立技术支持体系。\n' +
+        '**资源协调策略**：\n' +
+        '1. 评估双方需求的紧急度和商业价值；\n' +
+        '2. 寻找共性需求，一次开发满足两边；\n' +
+        '3. 采用分阶段交付：先满足内部紧急需求的最小可行版本，同时启动外部客户高优需求的预研；\n' +
+        '4. 与双方沟通预期，争取理解，必要时适当增加短期资源投入。'
+    }];  // 此处保持原字节跳动题目不变
+
+
+
+} else if (qRole === 'Java') {
+    // 🔥 替换为真正的 Java 工程师模拟真题
+    questions = [
+        { id: 1, difficulty: 'Easy', title: 'boolean类型的可能取值有哪两个？', answer: 'true 和 false' },
+        { id: 2, difficulty: 'Easy', title: '在Java中，表示换行符的转义字符是什么？', answer: '\\n' },
+        { id: 3, difficulty: 'Easy', title: '下列哪一个语句正确描述了Java程序的编译结果？ A. Java程序经编译后会产生machine code B. Java程序经编译后会产生byte code C. Java程序经编译后会产生DLL D. 以上不正确', answer: 'B。Java程序经编译后会产生byte code，由JVM解释执行。' },
+        { id: 4, difficulty: 'Medium', title: '请简单分析Java语言中的final, finally, finalize三者的区别。', answer: 'final：修饰符，修饰类（不可继承）、方法（不可重写）、变量（常量）。finally：异常处理块，无论是否异常都执行（除非JVM退出）。finalize：Object类方法，垃圾回收前调用，但不确定。' },
+        { id: 5, difficulty: 'Medium', title: '编程题：计算任意两个日期之间间隔的天数。', answer: '使用Java 8的LocalDate和ChronoUnit：LocalDate date1 = ...; LocalDate date2 = ...; long days = ChronoUnit.DAYS.between(date1, date2);' },
+        { id: 6, difficulty: 'Medium', title: 'Overload（方法重载）和Override（方法重写）有什么区别？', answer: '重载：同一类中，参数列表不同，返回类型无关。重写：子类与父类间，方法签名相同，返回类型子类，访问权限不能更严格。' },
+        { id: 7, difficulty: 'Medium', title: '说说Java中创建线程的几种方式？', answer: '三种：继承Thread类、实现Runnable接口、实现Callable接口（有返回值）。' },
+        { id: 8, difficulty: 'Medium', title: '谈谈你对JVM的理解，以及JVM的内存区域是如何划分的？', answer: 'JVM内存区域：堆（对象）、方法区（类信息、常量、静态变量）、虚拟机栈（局部变量表等）、本地方法栈、程序计数器。' },
+        { id: 9, difficulty: 'Hard', title: 'Servlet生命周期阶段是？ A、加载和实例化 B、初始化 C、服务 D、销毁 E、以上全部', answer: 'E。Servlet生命周期由init()、service()、destroy()方法定义，对应加载实例化、初始化、服务、销毁阶段。' },
+        { id: 10, difficulty: 'Hard', title: '如果某个数据需要跨多个请求存在，则数据应该存储在？ A、session B、page C、request D、Response', answer: 'A。session可以在同一个浏览器的多次请求间共享数据。' }
+    ];
+} 
+
+else if (qRole === 'C++') {
+    // ========== C++工程师模拟真题（基于经典面试题整理） ==========
+    questions = [
+        { id: 1, difficulty: 'Easy', title: '请解释C++中的virtual关键字的作用。', answer: 'virtual关键字用于实现多态。在基类中声明虚函数，派生类可以重写该函数。通过基类指针或引用调用虚函数时，会根据实际对象类型动态绑定到正确的函数版本。纯虚函数（virtual void func() = 0）使类成为抽象类，不能实例化。' },
+        { id: 2, difficulty: 'Medium', title: '什么是RAII？请举例说明。', answer: 'RAII（Resource Acquisition Is Initialization）是C++资源管理技术，将资源的生命周期与对象的生命周期绑定。在构造函数中获取资源，在析构函数中释放资源。例如智能指针std::unique_ptr在构造时获取动态内存，析构时自动delete，避免内存泄漏。' },
+        { id: 3, difficulty: 'Medium', title: '智能指针有哪几种？它们有什么区别？', answer: 'C++11提供三种智能指针：unique_ptr（独占所有权，不可拷贝，可移动），shared_ptr（共享所有权，通过引用计数管理，可拷贝），weak_ptr（弱引用，配合shared_ptr避免循环引用）。' },
+        { id: 4, difficulty: 'Hard', title: 'const和constexpr的区别是什么？', answer: 'const表示只读变量，但可能不是编译时常量；constexpr声明编译时常量，函数或变量可在编译期求值。constexpr函数在参数为编译期常量时返回编译期常量。' },
+        { id: 5, difficulty: 'Medium', title: '重载(overload)和重写(override)的区别是什么？', answer: '重载发生在同一作用域内，函数名相同但参数列表不同；重写发生在派生类中，覆盖基类的虚函数，函数签名必须相同。' },
+        { id: 6, difficulty: 'Easy', title: '什么是封装、继承、多态？', answer: '封装：将数据和操作封装在类内部，隐藏细节；继承：派生类获得基类的成员；多态：同一接口不同实现，分为编译时多态（函数重载、模板）和运行时多态（虚函数）。' },
+        { id: 7, difficulty: 'Medium', title: '抽象类和接口的区别是什么？', answer: '抽象类至少包含一个纯虚函数，可以有成员变量和普通函数；接口（Java风格）在C++中通常指只包含纯虚函数的类，没有数据成员。' },
+        { id: 8, difficulty: 'Easy', title: '深拷贝和浅拷贝的区别？', answer: '浅拷贝只复制指针地址，多个对象共享同一资源，可能导致重复释放；深拷贝复制指针指向的内容，每个对象拥有独立副本。' },
+        { id: 9, difficulty: 'Hard', title: '空指针调用成员函数会发生什么？', answer: '如果成员函数未访问任何成员变量或虚函数，调用可能成功（未定义行为），但若访问成员变量或虚函数，会导致崩溃。' },
+        { id: 10, difficulty: 'Medium', title: 'C++如何实现多态？', answer: '通过虚函数表（vtable）。每个含有虚函数的类有一个虚函数表，对象中隐藏指针指向该表。调用虚函数时通过vptr找到实际函数地址。' },
+        { id: 11, difficulty: 'Easy', title: 'sizeof和strlen的区别？', answer: 'sizeof是运算符，编译时计算类型或变量所占内存大小（包括\\0）；strlen是函数，运行时计算字符串长度（不含\\0）。' },
+        { id: 12, difficulty: 'Medium', title: '结构体对齐的原因和规则？', answer: '对齐是为了提高内存访问效率。规则：每个成员按自身对齐系数对齐，结构体总大小为最大对齐系数的整数倍。' },
+        { id: 13, difficulty: 'Easy', title: '指针和引用的区别？', answer: '引用是变量的别名，必须初始化，不能改变指向；指针可以改变指向，可以为空。' },
+        { id: 14, difficulty: 'Medium', title: 'new/delete和malloc/free的区别？', answer: 'new/delete是运算符，会调用构造函数/析构函数；malloc/free是函数，仅分配/释放内存。' },
+        { id: 15, difficulty: 'Hard', title: '数组指针和指针数组的区别？', answer: '数组指针是指向数组的指针，如 int (*p)[10]；指针数组是存放指针的数组，如 int *p[10]。' },
+        { id: 16, difficulty: 'Medium', title: '什么是移动语义？std::move的作用？', answer: '移动语义允许将资源从一个对象转移到另一个对象，避免不必要的拷贝。std::move将左值转换为右值引用，触发移动构造函数/移动赋值。' },
+        { id: 17, difficulty: 'Hard', title: '完美转发std::forward的用法？', answer: 'std::forward用于模板函数中，根据参数的实际类型（左值/右值）进行转发，保持参数的左右值属性。' },
+        { id: 18, difficulty: 'Medium', title: 'Lambda表达式的语法和捕获方式？', answer: '语法：[捕获列表](参数列表) -> 返回类型 { 函数体 }。捕获方式：值捕获、引用捕获、混合捕获、默认捕获（=或&）。' },
+        { id: 19, difficulty: 'Medium', title: 'shared_ptr和unique_ptr的区别？', answer: 'shared_ptr允许多个指针共享同一对象，使用引用计数；unique_ptr独占所有权，不可拷贝，可以移动。' },
+        { id: 20, difficulty: 'Hard', title: '如何使用智能指针管理动态数组？', answer: 'unique_ptr：std::unique_ptr<int[]> ptr(new int[10])；shared_ptr：需自定义删除器，如std::shared_ptr<int> ptr(new int[10], std::default_delete<int[]>())，或使用vector代替。' },
+        { id: 21, difficulty: 'Medium', title: '编写一个函数，找出字符串中连续最长的数字串。', answer: '遍历字符串，记录当前数字串长度和最长串，更新最长串的起始位置。返回子串。' },
+        { id: 22, difficulty: 'Medium', title: '找出数组中出现次数超过一半的数字（摩尔投票法）。', answer: '摩尔投票法：维护候选数和计数，遍历数组，计数为0时设当前数为候选，相同则+1，不同则-1。最后验证候选数是否超过一半。' },
+        { id: 23, difficulty: 'Medium', title: '求最大子序列和（Kadane算法）。', answer: '动态规划，dp[i]表示以i结尾的最大子序列和，dp[i] = max(nums[i], dp[i-1]+nums[i])，同时记录全局最大值。' },
+        { id: 24, difficulty: 'Easy', title: '判断一个字符串是否为回文串。', answer: '双指针从两端向中间比较字符，忽略大小写和非字母数字字符。' }
+    ];
+} 
+
+
+
+
+
+
+
+else if (isDataAnalystRole) {
+    // ========== 数据分析师模拟真题（共10道） ==========
+    questions = [
+        {
+            id: 1,
+            difficulty: 'Medium',
+            title: '请解释什么是A/B测试？在数据分析中如何保证A/B测试的有效性？',
+            answer: 'A/B测试是将用户随机分为两组，分别体验不同版本，通过对比核心指标来评估效果差异。保证有效性需注意：①样本量足够且随机分组；②实验前确定核心指标和最小提升幅度；③控制其他变量不变；④避免“抢跑”和数据污染；⑤使用假设检验判断结果是否显著。'
+        },
+        {
+            id: 2,
+            difficulty: 'Hard',
+            title: '现有用户登录表 user_logins(user_id, login_date)，请写出SQL查询，计算每个月的活跃用户数及环比增长率。',
+            answer: '```sql\nWITH monthly AS (\n  SELECT \n    DATE_FORMAT(login_date, \'%Y-%m\') AS month,\n    COUNT(DISTINCT user_id) AS mau\n  FROM user_logins\n  GROUP BY 1\n)\nSELECT \n  month,\n  mau,\n  LAG(mau) OVER (ORDER BY month) AS prev_mau,\n  ROUND((mau - LAG(mau) OVER (ORDER BY month)) / LAG(mau) OVER (ORDER BY month) * 100, 2) AS growth_rate\nFROM monthly\nORDER BY month;\n```'
+        },
+        {
+            id: 3,
+            difficulty: 'Easy',
+            title: '请用Python实现一个函数，计算一组数据的均值和标准差（不使用numpy）。',
+            answer: '```python\ndef mean_std(data):\n    n = len(data)\n    mean = sum(data) / n\n    variance = sum((x - mean) ** 2 for x in data) / n  # 总体标准差\n    std = variance ** 0.5\n    return mean, std\n```'
+        },
+        {
+            id: 4,
+            difficulty: 'Medium',
+            title: '什么是辛普森悖论？请举例说明在数据分析中如何避免被误导。',
+            answer: '辛普森悖论指在分组比较中占优势，但在合并比较中却占劣势的现象。例如：某疗法分组治疗有效，但合并数据后反而无效。避免方法：①分析时考虑混杂变量（如年龄、性别）；②进行分层分析；③使用因果推断方法（如倾向性评分）；④不要轻易合并不同群体的数据。'
+        },
+        {
+            id: 5,
+            difficulty: 'Medium',
+            title: '如何评估一个分类模型的性能？请说明准确率、精确率、召回率和F1-score的区别。',
+            answer: '准确率=预测正确的样本数/总样本数；精确率=预测为正且实际为正/预测为正的样本数；召回率=预测为正且实际为正/实际为正的样本数；F1-score是精确率和召回率的调和平均数。在不平衡分类问题中，应更关注精确率和召回率，而非准确率。'
+        },
+        {
+            id: 6,
+            difficulty: 'Hard',
+            title: '某电商APP的次日留存率下降了5个百分点，你会如何分析原因？请写出分析思路。',
+            answer: '①确认数据准确性（口径、统计逻辑是否变化）；②拆解维度：新老用户、渠道、版本、地区等，定位下降最明显的群体；③排查近期变动（产品版本更新、运营活动、技术故障、外部竞争）；④进行用户调研或访谈；⑤结合用户行为日志分析关键行为（如注册、点击、购买）是否受影响；⑥提出假设并设计A/B实验验证。'
+        },
+        {
+            id: 7,
+            difficulty: 'Medium',
+            title: '请用Python实现k-means聚类算法的核心步骤（不使用sklearn）。',
+            answer: '```python\ndef k_means(X, k, max_iters=100):\n    centroids = X[np.random.choice(len(X), k, replace=False)]\n    for _ in range(max_iters):\n        distances = np.linalg.norm(X[:, np.newaxis] - centroids, axis=2)\n        labels = np.argmin(distances, axis=1)\n        new_centroids = np.array([X[labels == i].mean(axis=0) for i in range(k)])\n        if np.all(centroids == new_centroids):\n            break\n        centroids = new_centroids\n    return labels, centroids\n```'
+        },
+        {
+            id: 8,
+            difficulty: 'Easy',
+            title: '什么是中心极限定理？它在数据分析中有何应用？',
+            answer: '中心极限定理指出：当样本量足够大时，独立随机变量的均值近似服从正态分布，无论原始分布形态如何。应用：①构建均值的置信区间；②进行假设检验（如t检验）；③用正态近似计算概率；④为统计推断提供理论基础。'
+        },
+        {
+            id: 9,
+            difficulty: 'Medium',
+            title: '请解释什么是维度模型中的事实表和维度表，并举例说明。',
+            answer: '事实表记录业务过程的度量（如销售额、订单量），通常包含外键和数值指标；维度表描述事实的上下文（如时间、产品、用户）。例如：销售事实表包含日期ID、产品ID、销售额；时间维度表包含日期、星期、是否节假日等。'
+        },
+        {
+            id: 10,
+            difficulty: 'Hard',
+            title: '请估算北京市一天的共享单车使用量，并说明你的估算思路。',
+            answer: '估算思路：①北京市人口约2200万；②假设骑行人群以20-50岁为主，占比约40%（880万）；③假设共享单车渗透率30%，则潜在用户约264万；④平均每人每天骑行次数：通勤人群2次（上下班），非通勤0.5次，取加权平均约1.2次；⑤得到每日使用量约264万×1.2≈317万次。可进一步用车辆数×周转率交叉验证。'
+        }
+    ];
+} else {
+    // 其他岗位仍然使用通用生成逻辑
+    questions = makeQuestions(qRole, qCount);
+}
+
+
+const setId = `${qCompany}-${qRole}-${qTitleZh}`.replace(/\s+/g,'_');
+const sets = [{
+  id: setId,
+  titleZh: qTitleZh,
+  titleEn: qTitleEn,
+  role: qRole,
+  company: qCompany,
+  questions: questions
+}];
+
+/** 保存题集元信息，供“跨题集错题本”显示题集名 */
+function saveSetMeta(s){
+  const key = 'rr_set_meta';
+  const meta = JSON.parse(localStorage.getItem(key) || '{}');
+  meta[s.id] = { id:s.id, titleZh:s.titleZh, role:s.role, company:s.company };
+  localStorage.setItem(key, JSON.stringify(meta));
+}
+saveSetMeta(sets[0]);
+
+/** -----------------------
+ * 2) 状态 & 工具函数
+ * ---------------------- */
+let currentTab='all', currentSetId=sets[0].id, currentRender=[], currentQ=null;
+let drillActive=false, drillQueue=[], drillRounds=0, drillMaxRounds=0;
+
+const listEl = document.getElementById('list');
+const setSelect = document.getElementById('setSelect');
+const kwEl = document.getElementById('kw');
+const diffEl = document.getElementById('diff');
+
+function keyOf(setId){ return 'rr_record_' + setId; }
+function getSet(){ return sets.find(s=>s.id===currentSetId); }
+
+function getRec(setId){
+  try{return JSON.parse(localStorage.getItem(keyOf(setId))||'{}')}catch{return{}}
+}
+function setRec(setId,v){
+  localStorage.setItem(keyOf(setId), JSON.stringify(v));
+}
+function stClass(s){
+  if(s==='correct') return 'ok';
+  if(s==='wrong') return 'bad';
+  if(s==='unknown') return 'warn';
+  return 'none';
+}
+function stText(s){
+  if(s==='correct') return '已掌握';
+  if(s==='wrong') return '答错';
+  if(s==='unknown') return '未掌握';
+  return '未练习';
+}
+
+function refreshHeader(){
+  const s=getSet(), rec=getRec(s.id), total=s.questions.length;
+  const done=s.questions.filter(q=>rec[q.id]?.status).length;
+  document.getElementById('pageTitle').textContent = s.titleZh;
+  document.getElementById('cRole').textContent='岗位：'+s.role;
+  document.getElementById('cCount').textContent='题目数：'+total;
+  document.getElementById('cProgress').textContent='完成：'+Math.round(done/total*100)+'%';
+}
+
+function allCrossWrong(){
+  const arr=[];
+  const metaMap = JSON.parse(localStorage.getItem('rr_set_meta') || '{}');
+
+  Object.keys(localStorage).forEach(k=>{
+    if(!k.startsWith('rr_record_')) return;
+    const sid = k.replace('rr_record_','');
+    let rec = {};
+    try{ rec = JSON.parse(localStorage.getItem(k)||'{}') }catch{}
+
+    Object.entries(rec).forEach(([qid,v])=>{
+      if(v?.status!=='wrong') return;
+      const m = v.set || metaMap[sid] || {id:sid,titleZh:sid,role:'-'}
+      arr.push({
+        from:'cross',
+        setId:sid,
+        setTitle:m.titleZh || sid,
+        role:m.role || '-',
+        qid:+qid,
+        difficulty:v.question?.difficulty || 'Medium',
+        title:v.question?.title || ('题目#'+qid),
+        answer:v.question?.answer || '-',
+        status:'wrong',
+        attempts:v.attempts||0,
+        updatedAt:v.updatedAt||0
+      });
+    });
+  });
+
+  return arr.sort((a,b)=>b.updatedAt-a.updatedAt);
+}
+
+/** -----------------------
+ * 3) 渲染
+ * ---------------------- */
+function render(){
+  const kw=kwEl.value.trim().toLowerCase(), diff=diffEl.value;
+  const s=getSet(), rec=getRec(s.id);
+  let data=[];
+
+  if(currentTab==='all'||currentTab==='wrong'){
+    data = s.questions.map(q=>({
+      from:'set',
+      setId:s.id, setTitle:s.titleZh, role:s.role,
+      qid:q.id, title:q.title, answer:q.answer, difficulty:q.difficulty,
+      status:rec[q.id]?.status||'none', attempts:rec[q.id]?.attempts||0
+    }));
+    if(currentTab==='wrong') data=data.filter(i=>i.status==='wrong');
+  }else{
+    data = allCrossWrong();
+  }
+
+  data = data.filter(i=>{
+    const hitKw = !kw || i.title.toLowerCase().includes(kw) || i.setTitle.toLowerCase().includes(kw);
+    const hitDiff = diff==='all' || i.difficulty===diff;
+    return hitKw && hitDiff;
+  });
+
+  currentRender=data;
+
+  if(!data.length){
+    listEl.innerHTML='<div class="empty">暂无匹配题目</div>';
+    refreshHeader();
+    return;
+  }
+
+  listEl.innerHTML = data.map((i,idx)=>`
+    <article class="item">
+      <div>
+        <h3 class="q-title">${idx+1}. ${i.title}</h3>
+        <div class="meta">
+          <span class="tag">${i.difficulty}</span>
+          <span class="status ${stClass(i.status)}">${stText(i.status)}</span>
+          <span>${i.setTitle}</span>
+          <span>练习:${i.attempts||0}</span>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn ghost sm" onclick="openByIndex(${idx})">查看</button>
+        <button class="btn primary sm" onclick="openByIndex(${idx})">练习</button>
+      </div>
+    </article>
+  `).join('');
+
+  refreshHeader();
+}
+
+function openByIndex(i){
+  const it=currentRender[i]; if(!it) return;
+  currentQ=it;
+  document.getElementById('qTitle').textContent = `${it.qid}. ${it.title}`;
+  document.getElementById('qPrompt').textContent = it.title;
+  document.getElementById('qAnswer').textContent = it.answer || '-';
+  document.getElementById('drillHint').textContent = drillActive
+    ? `再练模式进行中：剩余 ${drillQueue.length} 题`
+    : '';
+  document.getElementById('qMask').style.display='flex';
+}
+
+function closeQ(){
+  document.getElementById('qMask').style.display='none';
+  currentQ=null;
+}
+
+function mark(status){
+  if(!currentQ) return;
+
+  const rec=getRec(currentQ.setId), old=rec[currentQ.qid]||{attempts:0};
+  rec[currentQ.qid]={
+    status,
+    attempts:(old.attempts||0)+1,
+    updatedAt:Date.now(),
+    question:{
+      id:currentQ.qid,title:currentQ.title,answer:currentQ.answer,difficulty:currentQ.difficulty
+    },
+    set:{id:currentQ.setId,titleZh:currentQ.setTitle,role:currentQ.role}
+  };
+  setRec(currentQ.setId,rec);
+
+  // 一键再练逻辑
+  if(drillActive){
+    const cur = drillQueue.shift();
+    drillRounds++;
+
+    // 答错/未掌握，放到队尾继续练
+    if(status !== 'correct') drillQueue.push(cur);
+
+    if(!drillQueue.length || drillRounds >= drillMaxRounds){
+      drillActive=false;
+      closeQ();
+      render();
+      alert('再练完成');
+      return;
+    }
+    render();
+    currentQ = drillQueue[0];
+    document.getElementById('qTitle').textContent = `${currentQ.qid}. ${currentQ.title}`;
+    document.getElementById('qPrompt').textContent = currentQ.title;
+    document.getElementById('qAnswer').textContent = currentQ.answer || '-';
+    document.getElementById('drillHint').textContent = `再练模式进行中：剩余 ${drillQueue.length} 题`;
+    return;
+  }
+
+  closeQ();
+  render();
+}
+
+function randomStart(){
+  if(!currentRender.length){ alert('当前筛选下没有可练习题目'); return; }
+  openByIndex(Math.floor(Math.random()*currentRender.length));
+}
+
+function drill(){
+  if(!currentRender.length){ alert('当前筛选下没有可练习题目'); return; }
+  drillActive = true;
+  drillQueue = [...currentRender];
+  drillRounds = 0;
+  drillMaxRounds = Math.max(20, currentRender.length * 3); // 防无限循环
+  currentQ = drillQueue[0];
+  document.getElementById('qTitle').textContent = `${currentQ.qid}. ${currentQ.title}`;
+  document.getElementById('qPrompt').textContent = currentQ.title;
+  document.getElementById('qAnswer').textContent = currentQ.answer || '-';
+  document.getElementById('drillHint').textContent = `再练模式进行中：剩余 ${drillQueue.length} 题`;
+  document.getElementById('qMask').style.display='flex';
+}
+
+function clearSet(){
+  if(!confirm('确认清空当前题集练习记录？')) return;
+  localStorage.removeItem(keyOf(currentSetId));
+  render();
+}
+
+/** -----------------------
+ * 4) 事件 & 初始化
+ * ---------------------- */
+document.querySelectorAll('.tab').forEach(btn=>{
+  btn.onclick=()=>{
+    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+    btn.classList.add('active');
+    currentTab=btn.dataset.tab;
+    render();
+  };
+});
+setSelect.onchange=e=>{ currentSetId=e.target.value; render(); };
+kwEl.oninput=render;
+diffEl.onchange=render;
+document.getElementById('randomBtn').onclick=randomStart;
+document.getElementById('drillBtn').onclick=drill;
+document.getElementById('clearSetBtn').onclick=clearSet;
+document.getElementById('qMask').addEventListener('click',e=>{ if(e.target.id==='qMask') closeQ(); });
+
+// 主题
+(function initTheme(){
+  const btn = document.getElementById('themeBtn');
+  const savedTheme=localStorage.getItem('theme') || (matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');
+  document.documentElement.setAttribute('data-theme', savedTheme);
+  const syncText = ()=> btn.textContent = document.documentElement.getAttribute('data-theme')==='dark' ? '浅色模式' : '深色模式';
+  syncText();
+  btn.onclick=()=>{
+    const cur=document.documentElement.getAttribute('data-theme');
+    document.documentElement.setAttribute('data-theme', cur==='dark'?'light':'dark');
+    localStorage.setItem('theme', document.documentElement.getAttribute('data-theme'));
+    syncText();
+  };
+})();
+
+(function init(){
+  setSelect.innerHTML = sets.map(s=>`<option value="${s.id}">${s.titleZh}</option>`).join('');
+  setSelect.value=currentSetId;
+  render();
+})();
+</script>
+</body>
+</html>

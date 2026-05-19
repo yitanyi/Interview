@@ -1,0 +1,115 @@
+{
+  "name": "Python算法工程师",
+  "tech_stack": [
+    "Python",
+    "数据结构与算法",
+    "机器学习 (Scikit-learn/TensorFlow)",
+    "深度学习",
+    "特征工程",
+    "模型部署"
+  ],
+  "question_bank": [
+    {
+      "id": "alg_051",
+      "type": "技术知识",
+      "question": "请解释什么是过拟合（Overfitting）和欠拟合（Underfitting）。在训练深度神经网络时，你有哪几种手段来防止过拟合？",
+      "answer_points": [
+        "过拟合：模型在训练集上表现极好，但在测试集上表现差，泛化能力弱。",
+        "欠拟合：模型在训练集上就表现不佳，未能捕捉数据的主要特征。",
+        "防止过拟合：1. 增加数据量（数据增强）。 2. 正则化（L1/L2 惩罚）。 3. Dropout（随机失活神经元）。 4. 早停（Early Stopping）。 5. 简化模型结构 [citation:9]。"
+      ],
+      "difficulty": 3
+    },
+    {
+      "id": "alg_052",
+      "type": "技术知识",
+      "question": "逻辑回归（Logistic Regression）是回归模型还是分类模型？它的损失函数是什么？为什么不用均方误差（MSE）？",
+      "answer_points": [
+        "分类模型，虽然名字里有回归，但主要用于二分类。",
+        "损失函数：对数损失函数（Log Loss）或交叉熵损失。",
+        "原因：逻辑回归使用 Sigmoid 函数，如果使用 MSE，损失函数是非凸的，存在很多局部极小值，难以优化。而交叉熵是凸函数，容易找到全局最优解 [citation:9]。"
+      ],
+      "difficulty": 4
+    },
+    {
+      "id": "alg_053",
+      "type": "技术知识",
+      "question": "请解释 Batch Normalization 的原理和作用。",
+      "answer_points": [
+        "原理：在每一层网络的输入（或输出）进行归一化，使其均值接近0，方差接近1，然后引入可学习的缩放和平移参数（β, γ）恢复数据分布。",
+        "作用：1. 加速收敛。 2. 缓解梯度消失/爆炸。 3. 具有一定的正则化效果，可以部分替代 Dropout。"
+      ],
+      "difficulty": 3
+    },
+    {
+      "id": "alg_054",
+      "type": "算法实现",
+      "question": "请手写一个 LRU (Least Recently Used) 缓存淘汰算法的实现。要求 get 和 put 操作的时间复杂度为 O(1)。",
+      "answer_points": [
+        "数据结构：哈希表（字典） + 双向链表。",
+        "哈希表：存储 key 到链表节点的映射。",
+        "双向链表：维护访问顺序，最近访问的放在头部，最久未访问的放在尾部。",
+        "get：如果 key 存在，将节点移到头部，返回值；否则返回 -1。",
+        "put：如果 key 存在，更新值并移到头部；如果不存在，创建节点加到头部，如果容量超限，删除尾部节点并从哈希表中移除 [citation:9]。"
+      ],
+      "difficulty": 5
+    },
+    {
+      "id": "alg_055",
+      "type": "算法实现",
+      "question": "给定一个未排序的整数数组，找出最长连续序列的长度。要求算法时间复杂度为 O(n)。（示例：[100, 4, 200, 1, 3, 2] -> 最长连续序列 [1, 2, 3, 4]，返回 4）",
+      "answer_points": [
+        "思路：使用哈希集合。",
+        "步骤：1. 将所有数字存入 set。 2. 遍历数组，对于每个数 x，如果 x-1 不在 set 中（说明 x 是序列起点），则开始 while 循环找 x+1, x+2...，记录长度。",
+        "原因：跳过非起点元素，保证每个数只被访问一次，达到 O(n) 复杂度。"
+      ],
+      "difficulty": 4
+    },
+    {
+      "id": "alg_056",
+      "type": "场景题",
+      "question": "假如我们需要给抖音/TikTok 设计一个简单的推荐系统，召回的阶段你会考虑哪些策略？",
+      "answer_points": [
+        "多路召回策略：",
+        "1. 协同过滤：基于用户历史行为（看过的视频）找相似用户或相似视频。",
+        "2. 向量召回：利用双塔模型，将用户和视频分别打成向量，通过向量相似度检索（如 Faiss）。",
+        "3. 热度召回：当前热门视频。",
+        "4. 社交召回：关注的好友点赞的视频。",
+        "5. 地域召回：同城/同地区的视频 [citation:9]。"
+      ],
+      "difficulty": 5
+    },
+    {
+      "id": "alg_057",
+      "type": "场景题",
+      "question": "如何判断用户画像中的两个用户是否为同一个人（用户合并问题）？你会怎么做？",
+      "answer_points": [
+        "特征融合：利用设备ID（IMEI, IDFA）、手机号、IP地址、登录 Cookie 等信息。",
+        "算法：使用图算法（如连通图）。将每个标识视为一个节点，如果两个标识经常出现在同一设备或同一行为中，则建立边。",
+        "聚类：基于图的连通分量进行聚类，合并同一个簇中的用户标识。",
+        "规则阈值：设置不同标识的置信度权重，例如同一个手机号绝对是同一个人，同一个 IP 可能是同一个人（但需考虑代理）。"
+      ],
+      "difficulty": 4
+    },
+    {
+      "id": "alg_058",
+      "type": "项目深挖",
+      "question": "你在离线训练好的模型，是如何部署到线上提供服务的？部署过程中遇到了哪些挑战？",
+      "answer_points": [
+        "部署方式：1. 使用 TensorFlow Serving / TorchServe 提供 RESTful/gRPC API。 2. 将模型打包成 Docker 镜像，通过 K8s 管理。",
+        "挑战：1. 数据一致性：在线请求的特征处理必须和离线训练时保持一致。 2. 性能：低延迟要求，需要引入模型量化或剪枝。 3. 监控：需要监控线上模型的推理结果分布，防止数据漂移。"
+      ],
+      "difficulty": 4
+    }
+  ],
+  "knowledge_base": [
+    "knowledge_base/architecture_design_patterns.md",
+    "knowledge_base/distributed_consensus_and_consistency.md",
+    "knowledge_base/ml_regularization.md",
+    "knowledge_base/python_large_scale_data_feature_engineering.md",
+    "knowledge_base/python_ml_engineering.md",
+    "knowledge_base/pytorch_inference_optimization.md",
+    "knowledge_base/recall_strategy.md",
+    "knowledge_base/model_deployment.md"
+  ]
+}

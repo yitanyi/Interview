@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>登录 · Interview</title>
+  <style>
+    /* 核心变量，与主页完全保持一致 */
+    :root{
+      --bg:#f5f7fb;
+      --panel:#ffffff;
+      --text:#0f172a;
+      --sub:#64748b;
+      --line:#e5eaf2;
+      --primary:#2563eb;
+      --primary-hover:#1d4ed8;
+      --success:#16a34a;
+      --danger:#ef4444;
+      --input-bg:#ffffff;
+    }
+
+    :root[data-theme="dark"]{
+      --bg:#0b1220;
+      --panel:#0f172a;
+      --text:#e2e8f0;
+      --sub:#94a3b8;
+      --line:#1e293b;
+      --primary:#3b82f6;
+      --primary-hover:#2563eb;
+      --success:#22c55e;
+      --danger:#f87171;
+      --input-bg:#111c31;
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      background:var(--bg);
+      color:var(--text);
+      font-family:Inter, "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* 顶部操作栏（切换语言和主题） */
+    .topbar {
+      padding: 20px 24px;
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    .btn{
+      border:none;border-radius:10px;height:40px;padding:0 14px;
+      font-size:14px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;
+      transition: all 0.2s;
+    }
+    .btn.primary{background:var(--primary);color:#fff; width: 100%; font-weight: 600; margin-top: 10px;}
+    .btn.primary:hover{background:var(--primary-hover); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(37,99,235,0.2);}
+    .btn.ghost{background:var(--panel);border:1px solid var(--line);color:var(--text);}
+    .btn.ghost:hover{background: var(--line);}
+    
+    .select{
+      height:40px;border:1px solid var(--line);background:var(--panel);
+      color:var(--text);border-radius:10px;padding:0 10px;font-size:14px;outline:none;
+      cursor: pointer;
+    }
+
+    /* 登录容器居中 */
+    .login-wrapper {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .login-card {
+      background: var(--panel);
+      width: 100%;
+      max-width: 420px;
+      border-radius: 20px;
+      padding: 40px;
+      box-shadow: 0 10px 40px rgba(15,23,42,0.08);
+      border: 1px solid var(--line);
+    }
+
+    /* Logo 样式 */
+    .logo-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 30px;
+      text-align: center;
+    }
+    .logo-badge{
+      width:48px;height:48px;border-radius:14px;
+      background: linear-gradient(135deg,#1d4ed8,#0ea5e9);
+      position: relative; margin-bottom: 16px;
+    }
+    .logo-badge::before{
+      content:"";position:absolute; inset:10px;
+      border:2.5px solid rgba(255,255,255,.92);border-radius:8px;
+    }
+    .logo-badge::after{
+      content:"";position:absolute; left:22px; top:12px; bottom:12px;
+      width:2.5px; background:rgba(255,255,255,.92);
+    }
+    .logo-container h1 { margin: 0; font-size: 24px; font-weight: 700; color: var(--text); }
+    .logo-container p { margin: 8px 0 0; color: var(--sub); font-size: 14px; }
+
+    /* 表单样式 */
+    .form-group { margin-bottom: 20px; }
+    .form-group label {
+      display: block; font-size: 13px; font-weight: 600; margin-bottom: 8px; color: var(--text);
+    }
+    .form-input {
+      width: 100%; height: 46px; border: 1px solid var(--line); background: var(--input-bg);
+      border-radius: 12px; padding: 0 16px; font-size: 14px; color: var(--text);
+      transition: border-color 0.2s; outline: none;
+    }
+    .form-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+    
+    .form-options {
+      display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; font-size: 13px;
+    }
+    .checkbox-label { display: flex; align-items: center; gap: 8px; cursor: pointer; color: var(--sub); }
+    .checkbox-label input { accent-color: var(--primary); width: 16px; height: 16px; cursor: pointer; }
+    .forgot-link { color: var(--primary); text-decoration: none; font-weight: 500; }
+    .forgot-link:hover { text-decoration: underline; }
+
+    .divider {
+      display: flex; align-items: center; text-align: center; margin: 24px 0; color: var(--sub); font-size: 12px;
+    }
+    .divider::before, .divider::after {
+      content: ''; flex: 1; border-bottom: 1px solid var(--line);
+    }
+    .divider::before { margin-right: 12px; }
+    .divider::after { margin-left: 12px; }
+
+    .social-login { display: flex; gap: 12px; }
+    .btn-social {
+      flex: 1; height: 44px; border: 1px solid var(--line); background: var(--panel);
+      border-radius: 12px; display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: background 0.2s;
+    }
+    .btn-social:hover { background: var(--line); }
+    .btn-social svg { width: 20px; height: 20px; fill: var(--text); }
+
+    .signup-text { text-align: center; margin-top: 24px; font-size: 14px; color: var(--sub); }
+    .signup-text a { color: var(--primary); text-decoration: none; font-weight: 600; }
+    .signup-text a:hover { text-decoration: underline; }
+
+  </style>
+</head>
+<body>
+
+  <!-- 顶部右上角工具栏 -->
+  <div class="topbar">
+    <select id="langSelect" class="select">
+      <option value="zh">中文</option>
+      <option value="en">English</option>
+    </select>
+    <button id="themeToggle" class="btn ghost">
+      <span id="themeToggleText">深色模式</span>
+    </button>
+  </div>
+
+  <!-- 登录主体 -->
+  <div class="login-wrapper">
+    <div class="login-card">
+      <div class="logo-container">
+        <div class="logo-badge"></div>
+        <h1>Interview</h1>
+        <p data-i18n="login.subtitle">欢迎回来，继续你的面试训练之旅</p>
+      </div>
+
+      <form onsubmit="handleLogin(event)">
+        <div class="form-group">
+          <label data-i18n="login.account">邮箱 / 手机号</label>
+          <input type="text" class="form-input" id="account" placeholder="请输入您的账号" required />
+        </div>
+        
+        <div class="form-group">
+          <label data-i18n="login.password">密码</label>
+          <input type="password" class="form-input" id="password" placeholder="请输入您的密码" required />
+        </div>
+
+        <div class="form-options">
+          <label class="checkbox-label">
+            <input type="checkbox" checked />
+            <span data-i18n="login.remember">自动登录</span>
+          </label>
+          <a href="#" class="forgot-link" data-i18n="login.forgot">忘记密码？</a>
+        </div>
+
+        <button type="submit" class="btn primary">
+          <span data-i18n="login.btn">登 录</span>
+        </button>
+      </form>
+
+      <div class="divider" data-i18n="login.or">或者使用其他方式登录</div>
+
+      <div class="social-login">
+        <!-- 假装这是微信图标 -->
+        <button class="btn-social" title="微信登录">
+          <svg viewBox="0 0 24 24"><path d="M8.5 14.5c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm7 0c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm5.7-4.1c0-3.6-3.6-6.4-8.1-6.4-4.5 0-8.1 2.9-8.1 6.4 0 3.6 3.6 6.4 8.1 6.4.7 0 1.4-.1 2.1-.3l2.8 1.4-.8-2.5c2.4-1.3 4-3.1 4-5zm-15.5 8.6c-3.1-1.6-5.2-4.1-5.2-7C.5 6.8 5.4 3 11.5 3s11 3.8 11 9c0 5-4.9 9-11 9-1.2 0-2.4-.2-3.6-.5l-4.5 2.2 1.3-4.2z"/></svg>
+        </button>
+        <!-- 假装这是 Github 图标 -->
+        <button class="btn-social" title="Github登录">
+          <svg viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+        </button>
+      </div>
+
+      <div class="signup-text">
+        <span data-i18n="login.noAccount">还没账号？</span> 
+        <a href="#" data-i18n="login.signup">免费注册</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 语言配置（保持与主页通用逻辑）
+    const messages = {
+      zh: {
+        theme:{ toDark:"深色模式", toLight:"浅色模式" },
+        login: {
+          subtitle: "欢迎回来，继续你的面试训练之旅",
+          account: "邮箱 / 手机号",
+          password: "密码",
+          remember: "自动登录",
+          forgot: "忘记密码？",
+          btn: "登 录",
+          or: "或者使用其他方式登录",
+          noAccount: "还没账号？",
+          signup: "免费注册"
+        }
+      },
+      en: {
+        theme:{ toDark:"Dark Mode", toLight:"Light Mode" },
+        login: {
+          subtitle: "Welcome back, continue your training",
+          account: "Email / Phone",
+          password: "Password",
+          remember: "Remember me",
+          forgot: "Forgot password?",
+          btn: "Sign In",
+          or: "Or continue with",
+          noAccount: "Don't have an account?",
+          signup: "Sign up free"
+        }
+      }
+    };
+
+    function getByPath(obj, path){
+      return path.split('.').reduce((o, k) => o && o[k], obj);
+    }
+
+    let currentLang = localStorage.getItem('lang') || 'zh';
+
+    function updateThemeBtnText(){
+      const theme = document.documentElement.getAttribute('data-theme') || 'light';
+      const key = theme === 'light' ? 'theme.toDark' : 'theme.toLight';
+      document.getElementById('themeToggleText').textContent = getByPath(messages[currentLang], key);
+    }
+
+    function applyTheme(theme){
+      document.documentElement.setAttribute('data-theme', theme);
+      localStorage.setItem('theme', theme);
+      updateThemeBtnText();
+    }
+
+    function applyLanguage(lang){
+      currentLang = lang;
+      localStorage.setItem('lang', lang);
+      document.documentElement.lang = lang === 'zh' ? 'zh-CN' : 'en';
+
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const txt = getByPath(messages[lang], el.dataset.i18n);
+        if (txt) {
+          if (el.tagName === 'INPUT' && el.type === 'text') {
+            el.placeholder = txt;
+          } else {
+            el.textContent = txt;
+          }
+        }
+      });
+      updateThemeBtnText();
+    }
+
+    // 初始化主题
+    const savedTheme = localStorage.getItem('theme');
+    const preferredDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    applyTheme(savedTheme || (preferredDark ? 'dark' : 'light'));
+
+    // 绑定事件
+    const langSelect = document.getElementById('langSelect');
+    langSelect.value = currentLang;
+    langSelect.addEventListener('change', e => applyLanguage(e.target.value));
+
+    document.getElementById('themeToggle').addEventListener('click', () => {
+      const cur = document.documentElement.getAttribute('data-theme') || 'light';
+      applyTheme(cur === 'light' ? 'dark' : 'light');
+    });
+
+    applyLanguage(currentLang);
+
+    // 【核心小魔法】模拟登录，跳转到主页
+    function handleLogin(event) {
+      event.preventDefault(); // 阻止表单默认提交刷新
+      
+      const btn = event.target.querySelector('button[type="submit"]');
+      const originalText = btn.innerHTML;
+      
+      // 做一个假的加载动画效果
+      btn.innerHTML = currentLang === 'zh' ? '登录中...' : 'Signing in...';
+      btn.style.opacity = '0.8';
+      
+      // 模拟等待 0.8 秒后跳转
+      setTimeout(() => {
+        // 跳转到你之前创建的主页文件 index.html
+        window.location.href = './index.html';
+      }, 800);
+    }
+  </script>
+</body>
+</html>

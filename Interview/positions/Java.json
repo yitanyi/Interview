@@ -1,0 +1,117 @@
+{
+  "name": "Java后端开发工程师",
+  "tech_stack": [
+    "Java (JVM, 并发, 集合)",
+    "Spring Boot/Cloud",
+    "MySQL",
+    "Redis",
+    "Kafka/RocketMQ",
+    "微服务设计"
+  ],
+  "question_bank": [
+    {
+      "id": "java_004",
+      "type": "技术知识",
+      "question": "请详细描述HashMap的内部实现机制。在JDK 1.8中，引入了哪些优化来解决哈希冲突？",
+      "answer_points": [
+        "数据结构：数组+链表+红黑树。",
+        "put流程：计算hash，定位索引，插入链表或红黑树。",
+        "扩容机制：加载因子0.75，扩容为原容量的2倍，并重新hash (rehashing)。",
+        "JDK 1.8优化：链表长度超过8且数组长度超64时转为红黑树，减少查找时间复杂度从O(n)到O(log n) [citation:2]。"
+      ],
+      "difficulty": 4
+    },
+    {
+      "id": "java_005",
+      "type": "技术知识",
+      "question": "谈谈你对Java内存模型（JMM）的理解。volatile关键字是如何保证可见性和禁止指令重排的？",
+      "answer_points": [
+        "JMM抽象结构：主内存和工作内存。",
+        "可见性：volatile变量的写会立即刷新回主内存，读会从主内存重新加载，通过内存屏障禁止缓存。",
+        "有序性：通过内存屏障（LoadLoad, StoreStore等）禁止编译器/处理器重排序 [citation:1]。",
+        "不保证原子性（如i++操作）。"
+      ],
+      "difficulty": 4
+    },
+    {
+      "id": "java_006",
+      "type": "技术知识",
+      "question": "Java中的线程池是如何工作的？如果我想创建一个固定大小的线程池，提交一个任务后，线程池的处理流程是怎样的？",
+      "answer_points": [
+        "核心参数：corePoolSize, maximumPoolSize, workQueue, handler。",
+        "处理流程：1. 如果线程数 < corePoolSize，创建新线程。 2. 如果 >= corePoolSize，尝试放入阻塞队列。 3. 如果队列满，且线程数 < maximumPoolSize，创建新线程。 4. 如果队列满且线程数已达maximumPoolSize，执行拒绝策略 [citation:3]。",
+        "拒绝策略：AbortPolicy（抛异常）、CallerRunsPolicy（调用者执行）、DiscardPolicy（丢弃）等。"
+      ],
+      "difficulty": 3
+    },
+    {
+      "id": "java_007",
+      "type": "技术知识",
+      "question": "Spring Boot 自动配置的原理是什么？如何在自定义Starter中实现自动配置？",
+      "answer_points": [
+        "核心：@SpringBootApplication 包含 @EnableAutoConfiguration。",
+        "关键：META-INF/spring.factories 文件中配置的 EnableAutoConfiguration 类。",
+        "原理：SpringFactoriesLoader 加载工厂类，通过 @Conditional 系列注解（如 @ConditionalOnClass, @ConditionalOnMissingBean）按条件装配 Bean [citation:1]。",
+        "自定义Starter：需要配置 spring.factories 并编写基于 @Configuration 的自动配置类。"
+      ],
+      "difficulty": 4
+    },
+    {
+      "id": "java_008",
+      "type": "技术知识",
+      "question": "MySQL 索引的最左前缀原则是什么？请举例说明哪些查询会导致索引失效。",
+      "answer_points": [
+        "最左前缀原则：针对联合索引，查询必须从索引的最左边列开始，不能跳过中间的列。",
+        "失效场景：1. 隐式类型转换（如字符串字段没加引号）。 2. 对索引列使用函数或计算。 3. like 查询以 % 开头。 4. 使用 or 且左右不全是索引。 5. 违反最左前缀原则 [citation:2]。"
+      ],
+      "difficulty": 3
+    },
+    {
+      "id": "java_009",
+      "type": "场景题",
+      "question": "如何设计一个高可用的分布式锁？使用 Redis 实现有哪些需要注意的细节？",
+      "answer_points": [
+        "方案：基于 Redis 的 SET NX PX 命令或 Redisson 框架。",
+        "核心：原子性（加锁和设置过期时间必须原子执行）。",
+        "细节：1. 设置合理的过期时间，防止死锁。 2. 需要添加线程标识（如UUID），防止误删别人的锁。 3. 释放锁时要判断标识并保证原子性（通常使用Lua脚本）。 4. 考虑 RedLock 算法解决主从切换导致锁丢失的问题。"
+      ],
+      "difficulty": 5
+    },
+    {
+      "id": "java_010",
+      "type": "场景题",
+      "question": "假如你负责设计一个秒杀系统，如何防止库存超卖？并请描述从用户点击到订单生成的全链路架构。",
+      "answer_points": [
+        "前端：页面静态化，按钮置灰，限流。",
+        "网关层：Nginx 限流（如令牌桶）。",
+        "服务层：1. 使用 Redis 预减库存（原子操作 DECR）。 2. 请求进入消息队列（Kafka/RocketMQ）削峰。 3. 数据库层：使用乐观锁（版本号）更新库存，避免长事务 [citation:1]。",
+        "最终一致性：队列异步处理订单，通过回调通知用户结果。"
+      ],
+      "difficulty": 5
+    },
+    {
+      "id": "java_011",
+      "type": "项目深挖",
+      "question": "在你的项目中，你是如何保证缓存（Redis）和数据库（MySQL）数据一致性的？有哪些方案？",
+      "answer_points": [
+        "旁路缓存模式：读缓存，缓存不存在则读库并回写。",
+        "更新策略：1. 先更新数据库，后删除缓存（延迟双删）。 2. 先更新数据库，后更新缓存（并发下容易数据不一致）。 3. 基于Canal监听MySQL binlog，异步刷新缓存。",
+        "最终一致性：设置缓存过期时间兜底。"
+      ],
+      "difficulty": 4
+    }
+  ],
+  "knowledge_base": [
+    "knowledge_base/architecture_design_patterns.md",
+    "knowledge_base/backend_architecture_patterns.md",
+    "knowledge_base/distributed_consensus_and_consistency.md",
+    "knowledge_base/java_concurrency_deep_dive.md",
+    "knowledge_base/java_engineering_handbook.md",
+    "knowledge_base/jvm_memory_model.md",
+    "knowledge_base/jvm_performance_tuning_handbook.md",
+    "knowledge_base/microservices_gateway_design.md",
+    "knowledge_base/mysql_index_optimization.md",
+    "knowledge_base/redis_distributed_lock.md"
+  
+  ]
+}
